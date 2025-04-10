@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="et" class="dark">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Masinaoperaator – Uus tellimus</title>
+    <link href="./output.css" rel="stylesheet" />
+</head>
+
+<body
+    class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 flex justify-center items-center min-h-screen p-4">
+    <div class="w-full max-w-2xl bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-3xl font-bold text-center w-full">Uus töökäsk</h1>
+        </div>
+
+        <form id="order-form" class="space-y-5">
+            <!-- Aadress -->
+            <div>
+                <label class="block font-semibold mb-2">Aadress:</label>
+                <div class="flex gap-3">
+                    <button type="button"
+                        class="order-btn bg-blue-600 text-white px-4 py-2 rounded-3xl hover:bg-blue-700">90</button>
+                    <button type="button"
+                        class="order-btn bg-blue-600 text-white px-4 py-2 rounded-3xl hover:bg-blue-700">99</button>
+                    <button type="button"
+                        class="order-btn bg-blue-600 text-white px-4 py-2 rounded-3xl hover:bg-blue-700">Muu</button>
+                </div>
+            </div>
+
+            <!-- Töökäsk -->
+            <div>
+                <label class="block font-semibold mb-2">Töökäsk:</label>
+                <div class="flex flex-wrap gap-3">
+                    <button type="button"
+                        class="order-btn bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Kumm</button>
+                    <button type="button"
+                        class="order-btn bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Pakkematerjal</button>
+                    <button type="button"
+                        class="order-btn bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Komponent</button>
+                    <button type="button"
+                        class="order-btn bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Toodangu
+                        äraviimine</button>
+                </div>
+                <input type="hidden" id="order-type" name="order_type" />
+            </div>
+
+            <!-- Uus kast -->
+            <div id="replacement-crate-section" class="hidden">
+                <label class="block font-semibold mb-2">Kas on vaja uut kasti?</label>
+                <label class="inline-flex items-center">
+                    <input type="checkbox" id="replacement-crate" class="mr-2" />
+                    <span>Too uus kast</span>
+                </label>
+            </div>
+
+            <!-- Märkused -->
+            <div>
+                <label for="additional-notes" class="block font-semibold mb-2">Märkused (valikuline):</label>
+                <textarea id="additional-notes"
+                    class="border dark:border-gray-700 bg-white dark:bg-gray-700 p-2 w-full rounded" rows="3"
+                    placeholder="Kirjuta siia..."></textarea>
+            </div>
+
+            <!-- Submit -->
+            <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded w-full hover:bg-green-700">
+                Saada tellimus
+            </button>
+        </form>
+
+    </div>
+
+    <script>
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark');
+        }
+    </script>
+    <script src="machine_operator.js"></script>
+</body>
+
+</html>

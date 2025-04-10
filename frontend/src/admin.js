@@ -1,0 +1,54 @@
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("create-employee-form");
+    const roleSelect = document.getElementById("role");
+    const errorMessageElement = document.getElementById("error-message");
+    const successMessageElement = document.getElementById("success-message");
+
+    if (!form || !roleSelect) {
+        console.error("Form or role dropdown not found!");
+        return;
+    }
+
+    form.addEventListener("submit", async function (event) {
+        event.preventDefault();
+
+        const newUsername = document.getElementById("employee-username").value.trim();
+        const newPassword = document.getElementById("employee-password").value.trim();
+        const role = roleSelect.value.trim();
+
+        if (!newUsername || !newPassword || !role) {
+            errorMessageElement.textContent = "All fields are required.";
+            return;
+        }
+
+        try {
+            const token = localStorage.getItem("authToken");
+            if (!token) {
+                errorMessageElement.textContent = "You must be logged in as an admin.";
+                return;
+            }
+
+            const response = await fetch("http://localhost:3000/api/create-employee", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`,
+                },
+                body: JSON.stringify({ newUsername, newPassword, role }),
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                successMessageElement.textContent = "Employee created successfully!";
+                errorMessageElement.textContent = "";
+            } else {
+                errorMessageElement.textContent = "❌ " + data.message;
+                successMessageElement.textContent = "";
+            }
+        } catch (error) {
+            console.error("Error creating employee:", error);
+            errorMessageElement.textContent = "An error occurred. Please try again.";
+        }
+    });
+});

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Employee Account</title>
+    <script src="admin.js" defer></script>
+</head>
+
+<body>
+    <h1>Create New Employee Account</h1>
+
+    <form id="create-employee-form">
+        <input type="text" id="employee-username" placeholder="Employee Username" required>
+        <input type="password" id="employee-password" placeholder="Employee Password" required>
+
+
+        <select id="role" required>
+            <option value="" disabled selected>Select Role</option>
+            <option value="machine_operator">Machine Operator</option>
+            <option value="hall_worker">Hall Worker</option>
+        </select>
+
+        <button type="submit">Create Employee</button>
+    </form>
+
+    <div id="error-message"></div>
+    <div id="success-message"></div>
+</body>
+
+</html>
