@@ -180,16 +180,16 @@ app.get("/api/orders", verifyToken, (req, res) => {
 
 
 // Mark order as received
-app.put("/api/orders/received/:id", verifyToken, (req, res) => {
+app.put("/api/orders/in-progress/:id", verifyToken, (req, res) => {
     if (req.user.role !== "hall_worker") {
-        return res.status(403).json({ success: false, message: "Unauthorized. Only hall workers can mark orders as received." });
+        return res.status(403).json({ success: false, message: "Unauthorized. Only hall workers can mark orders as in progress." });
     }
 
     const orderId = req.params.id;
 
-    // Mark the order as received
+    // Mark as in progress
     db.query(
-        "UPDATE orders SET status = 'received' WHERE id = ? AND status = 'pending'", // Only mark as received if it's still in "pending"
+        "UPDATE orders SET status = 'in_progress' WHERE id = ? AND status = 'pending'",
         [orderId],
         (err, result) => {
             if (err) {
@@ -198,25 +198,28 @@ app.put("/api/orders/received/:id", verifyToken, (req, res) => {
             }
 
             if (result.affectedRows > 0) {
-                res.json({ success: true, message: "Order marked as received!" });
+                res.json({ success: true, message: "Order marked as in progress!" });
             } else {
-                res.status(400).json({ success: false, message: "Order could not be marked as received." });
+                res.status(400).json({ success: false, message: "Order could not be marked as in progress." });
             }
         }
     );
 });
 
-// Move order to in-progress
+
+// Move to in progress
 app.put("/api/orders/:id", verifyToken, (req, res) => {
-    if (req.user.role !== "hall_worker") {
-        return res.status(403).json({ success: false, message: "Unauthorized. Only hall workers can update orders." });
+    const orderId = req.params.id;
+    const newStatus = req.body.status;
+
+    // Validate status
+    if (!["pending", "in_progress", "completed"].includes(newStatus)) {
+        return res.status(400).json({ success: false, message: "Invalid status" });
     }
 
-    const orderId = req.params.id;
-
     db.query(
-        "UPDATE orders SET status = 'in_progress' WHERE id = ?",
-        [orderId],
+        "UPDATE orders SET status = ? WHERE id = ?",
+        [newStatus, orderId],
         (err, result) => {
             if (err) {
                 console.error("Database Error:", err);
@@ -224,9 +227,9 @@ app.put("/api/orders/:id", verifyToken, (req, res) => {
             }
 
             if (result.affectedRows > 0) {
-                res.json({ success: true, message: "Order moved to in-progress!" });
+                res.json({ success: true, message: `Order status updated to ${newStatus}!` });
             } else {
-                res.status(400).json({ success: false, message: "Order could not be moved to in-progress." });
+                res.status(400).json({ success: false, message: "Order not found or status unchanged." });
             }
         }
     );

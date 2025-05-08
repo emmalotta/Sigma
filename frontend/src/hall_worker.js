@@ -1,22 +1,22 @@
-// Get the auth token
 const token = localStorage.getItem('authToken');
 
 if (!token) {
     window.location.href = "login.html";
 }
 
-// State to keep track of active tab
 let activeTab = 'pending';
 
-// Switch between tabs
+
 function showTab(tab) {
     activeTab = tab;
 
-    // Update tab button styles
     document.getElementById('pending-tab').classList.toggle('bg-blue-600', tab === 'pending');
     document.getElementById('pending-tab').classList.toggle('bg-gray-600', tab !== 'pending');
     document.getElementById('in-progress-tab').classList.toggle('bg-blue-600', tab === 'in-progress');
     document.getElementById('in-progress-tab').classList.toggle('bg-gray-600', tab !== 'in-progress');
+    document.getElementById('history-tab').classList.toggle('bg-blue-600', tab === 'history');
+    document.getElementById('history-tab').classList.toggle('bg-gray-600', tab !== 'history');
+
 
     fetchOrders();
 }
@@ -33,22 +33,25 @@ async function fetchOrders() {
         const data = await response.json();
 
         if (data.success) {
-            // Clear the container before adding new content
+
             const ordersContainer = document.getElementById("orders-container");
             ordersContainer.innerHTML = '';
 
-            // Separate orders by status
             const pendingOrders = data.orders.filter(order => order.status === 'pending');
             const inProgressOrders = data.orders.filter(order => order.status === 'in_progress');
+            const completedOrders = data.orders.filter(order => order.status === 'completed');
 
-            // Display the orders based on the active tab
             if (activeTab === 'pending') {
                 displayOrders(pendingOrders, 'Ootel tellimused');
             } else if (activeTab === 'in-progress') {
                 displayOrders(inProgressOrders, 'Töös olevad tellimused');
+                //no worky
+            } else if (activeTab === 'history') {
+                displayOrders(completedOrders, 'Ajalugu');
+            } else {
+                showError("Tellimuste laadimine ebaõnnestus.");
             }
-        } else {
-            showError("Tellimuste laadimine ebaõnnestus.");
+
         }
     } catch (error) {
         console.error("Viga tellimuste laadimisel:", error);
@@ -57,7 +60,7 @@ async function fetchOrders() {
 }
 
 
-// Display orders in their respective sections
+// Display orders
 function displayOrders(orders, sectionTitle) {
     const ordersContainer = document.getElementById("orders-container");
     const section = document.createElement("div");
@@ -71,7 +74,7 @@ function displayOrders(orders, sectionTitle) {
     ordersContainer.appendChild(section);
 }
 
-// Create order card HTML that matches the table layout
+// Card
 function createOrderCard(order) {
     const row = document.createElement("tr");
     row.className = "bg-gray-100 dark:bg-gray-700 transition";
@@ -89,16 +92,38 @@ function createOrderCard(order) {
         ${order.additional_notes ? `
             <td class="p-4">${order.additional_notes}</td>` : `
             <td class="p-4">-</td>`}
-        <td class="p-4">
-            <button class="mt-3 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition" 
-                onclick="markOrderInProgress(${order.id})">Liigu töösse</button>
-        </td>
+        <td class="p-4" id="action-${order.id}"></td>
     `;
+
+    // Create buttons based on the active tab
+    const actionCell = row.querySelector(`#action-${order.id}`);
+    if (activeTab === 'pending') {
+        const takeButton = document.createElement("button");
+        takeButton.textContent = "Võta vastu";
+        takeButton.className = "px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition";
+        takeButton.onclick = () => markOrderInProgress(order.id);
+        actionCell.appendChild(takeButton);
+    } else if (activeTab === 'in-progress') {
+        const cancelButton = document.createElement("button");
+        cancelButton.textContent = "Loobu";
+        cancelButton.className = "mr-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition";
+        cancelButton.onclick = () => markOrderPending(order.id);
+
+        const completeButton = document.createElement("button");
+        completeButton.textContent = "Täidetud";
+        completeButton.className = "px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition";
+        completeButton.onclick = () => markOrderCompleted(order.id);
+
+        actionCell.appendChild(cancelButton);
+        actionCell.appendChild(completeButton);
+    }
 
     return row;
 }
 
-// Update fetchOrders to correctly append rows
+
+
+// Fetch
 async function fetchOrders() {
     try {
         const response = await fetch('http://localhost:3000/api/orders', {
@@ -111,24 +136,22 @@ async function fetchOrders() {
         const data = await response.json();
 
         if (data.success) {
-            // Clear the container before adding new content
+
             const ordersContainer = document.getElementById("orders-container");
             ordersContainer.innerHTML = '';
 
-            // Separate orders by status
             const pendingOrders = data.orders.filter(order => order.status === 'pending');
             const inProgressOrders = data.orders.filter(order => order.status === 'in_progress');
 
-            // Display the orders based on the active tab
             if (activeTab === 'pending') {
                 pendingOrders.forEach(order => {
                     const orderCard = createOrderCard(order);
-                    ordersContainer.appendChild(orderCard); // Add to tbody
+                    ordersContainer.appendChild(orderCard);
                 });
             } else if (activeTab === 'in-progress') {
                 inProgressOrders.forEach(order => {
                     const orderCard = createOrderCard(order);
-                    ordersContainer.appendChild(orderCard); // Add to tbody
+                    ordersContainer.appendChild(orderCard);
                 });
             }
         } else {
@@ -144,7 +167,7 @@ async function fetchOrders() {
 
 
 
-
+//MARK ORDER RECEIVED
 async function markOrderReceived(orderId) {
     try {
         const response = await fetch(`http://localhost:3000/api/orders/received/${orderId}`, {
@@ -170,7 +193,7 @@ async function markOrderReceived(orderId) {
     }
 }
 
-// Move order to in-progress
+// MARK ORDER IN PROGRESS
 async function markOrderInProgress(orderId) {
     try {
         const response = await fetch(`http://localhost:3000/api/orders/${orderId}`, {
@@ -196,13 +219,50 @@ async function markOrderInProgress(orderId) {
     }
 }
 
+async function updateOrderStatus(orderId, newStatus) {
+    try {
+        const response = await fetch(`http://localhost:3000/api/orders/${orderId}`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ status: newStatus })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            alert(`Tellimuse staatus muudetud: ${newStatus}!`);
+            fetchOrders(); // Refresh the list
+        } else {
+            showError(`Tellimuse staatuse muutmine ebaõnnestus: ${data.message}`);
+        }
+    } catch (error) {
+        console.error(`Viga tellimuse staatuse muutmisel:`, error);
+        showError("Tellimuse staatuse muutmisel tekkis viga.");
+    }
+}
+
+// Using the generic update function for both buttons
+function markOrderPending(orderId) {
+    updateOrderStatus(orderId, 'pending');
+}
+
+function markOrderCompleted(orderId) {
+    updateOrderStatus(orderId, 'completed');
+}
+
+function markOrderInProgress(orderId) {
+    updateOrderStatus(orderId, 'in_progress');
+}
 
 
 
 
 
 
-// Show error message
+// Error
 function showError(message) {
     const ordersContainer = document.getElementById("orders-container");
     ordersContainer.innerHTML = `
@@ -212,7 +272,7 @@ function showError(message) {
     `;
 }
 
-// Initialize with the default tab
+
 document.addEventListener("DOMContentLoaded", () => {
     showTab('pending');
 });
