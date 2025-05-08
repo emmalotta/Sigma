@@ -117,7 +117,7 @@ app.post("/api/create-employee", verifyToken, async (req, res) => {
 
 
 
-// ORDERS
+// Create order (Machine Operators)
 app.post("/api/orders", verifyToken, (req, res) => {
     if (req.user.role !== "machine_operator") {
         return res.status(403).json({ success: false, message: "Unauthorized. Only machine operators can create orders." });
@@ -161,13 +161,14 @@ app.post("/api/orders", verifyToken, (req, res) => {
 
 
 
-// Retrieve pending orders (Hall Workers)
+
+// Retrieve all orders (both pending and in-progress) for Hall Workers
 app.get("/api/orders", verifyToken, (req, res) => {
     if (req.user.role !== "hall_worker") {
         return res.status(403).json({ success: false, message: "Unauthorized. Only hall workers can view orders." });
     }
 
-    db.query("SELECT * FROM orders WHERE status = 'pending'", (err, results) => {
+    db.query("SELECT * FROM orders WHERE status IN ('pending', 'in_progress')", (err, results) => {
         if (err) {
             console.error("Database Error:", err);
             return res.status(500).json({ success: false, message: "Database error" });
@@ -177,26 +178,61 @@ app.get("/api/orders", verifyToken, (req, res) => {
 });
 
 
-// Mark order as received (Hall Workers)
-app.put("/api/orders/:id", verifyToken, (req, res) => {
+
+// Mark order as received
+app.put("/api/orders/received/:id", verifyToken, (req, res) => {
     if (req.user.role !== "hall_worker") {
-        return res.status(403).json({ success: false, message: "Unauthorized. Only hall workers can receive orders." });
+        return res.status(403).json({ success: false, message: "Unauthorized. Only hall workers can mark orders as received." });
     }
 
     const orderId = req.params.id;
 
+    // Mark the order as received
     db.query(
-        "UPDATE orders SET status = 'received' WHERE id = ?",
+        "UPDATE orders SET status = 'received' WHERE id = ? AND status = 'pending'", // Only mark as received if it's still in "pending"
         [orderId],
         (err, result) => {
             if (err) {
                 console.error("Database Error:", err);
                 return res.status(500).json({ success: false, message: "Database error" });
             }
-            res.json({ success: true, message: "Order marked as received!" });
+
+            if (result.affectedRows > 0) {
+                res.json({ success: true, message: "Order marked as received!" });
+            } else {
+                res.status(400).json({ success: false, message: "Order could not be marked as received." });
+            }
         }
     );
 });
+
+// Move order to in-progress
+app.put("/api/orders/:id", verifyToken, (req, res) => {
+    if (req.user.role !== "hall_worker") {
+        return res.status(403).json({ success: false, message: "Unauthorized. Only hall workers can update orders." });
+    }
+
+    const orderId = req.params.id;
+
+    db.query(
+        "UPDATE orders SET status = 'in_progress' WHERE id = ?",
+        [orderId],
+        (err, result) => {
+            if (err) {
+                console.error("Database Error:", err);
+                return res.status(500).json({ success: false, message: "Database error" });
+            }
+
+            if (result.affectedRows > 0) {
+                res.json({ success: true, message: "Order moved to in-progress!" });
+            } else {
+                res.status(400).json({ success: false, message: "Order could not be moved to in-progress." });
+            }
+        }
+    );
+});
+
+
 
 
 
