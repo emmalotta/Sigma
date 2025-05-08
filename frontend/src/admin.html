@@ -1,28 +1,139 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="et">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Employee Account</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lisa töötaja</title>
     <script src="admin.js" defer></script>
+    <style>
+        /* styles unchanged */
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #1e1e2f;
+            --form-bg: #f2f2f7;
+            --input-bg: #ffffff;
+            --input-text: #000000;
+            --placeholder-color: #888888;
+            --button-bg: #4a90e2;
+            --button-hover: #357abd;
+            --error-color: #d32f2f;
+            --success-color: #388e3c;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #1e1e2f;
+                --text-color: #f5f5f5;
+                --form-bg: #2b2b40;
+                --input-bg: #3a3a55;
+                --input-text: #ffffff;
+                --placeholder-color: #bbb;
+                --button-bg: #4a90e2;
+                --button-hover: #357abd;
+                --error-color: #ff6b6b;
+                --success-color: #6bffb7;
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        h1 {
+            margin-bottom: 1.5rem;
+        }
+
+        form {
+            background-color: var(--form-bg);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            width: 100%;
+            max-width: 400px;
+            transition: background-color 0.3s ease;
+        }
+
+        input,
+        select {
+            padding: 0.8rem;
+            border: none;
+            border-radius: 8px;
+            background-color: var(--input-bg);
+            color: var(--input-text);
+            font-size: 1rem;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        input::placeholder {
+            color: var(--placeholder-color);
+        }
+
+        select:invalid {
+            color: var(--placeholder-color);
+        }
+
+        button {
+            padding: 0.9rem;
+            border: none;
+            border-radius: 8px;
+            background-color: var(--button-bg);
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+        }
+
+        button:hover {
+            background-color: var(--button-hover);
+        }
+
+        #error-message,
+        #success-message {
+            margin-top: 1rem;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        #error-message {
+            color: var(--error-color);
+        }
+
+        #success-message {
+            color: var(--success-color);
+        }
+    </style>
 </head>
 
 <body>
-    <h1>Create New Employee Account</h1>
+    <h1>Lisa töötaja</h1>
 
     <form id="create-employee-form">
-        <input type="text" id="employee-username" placeholder="Employee Username" required>
-        <input type="password" id="employee-password" placeholder="Employee Password" required>
-
+        <input type="text" id="employee-username" placeholder="Töötaja id" required />
+        <input type="password" id="employee-password" placeholder="Töötaja parool" required />
 
         <select id="role" required>
-            <option value="" disabled selected>Select Role</option>
-            <option value="machine_operator">Machine Operator</option>
-            <option value="hall_worker">Hall Worker</option>
+            <option value="" disabled selected>Vali roll</option>
+            <option value="machine_operator">Masinaoperaator</option>
+            <option value="hall_worker">Saalitöötaja</option>
         </select>
 
-        <button type="submit">Create Employee</button>
+        <button type="submit">Loo Töötaja</button>
     </form>
 
     <div id="error-message"></div>

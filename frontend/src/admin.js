@@ -17,14 +17,14 @@ document.addEventListener("DOMContentLoaded", function () {
         const role = roleSelect.value.trim();
 
         if (!newUsername || !newPassword || !role) {
-            errorMessageElement.textContent = "All fields are required.";
+            errorMessageElement.textContent = "Kõik väljad on kohustuslikud.";
             return;
         }
 
         try {
             const token = localStorage.getItem("authToken");
             if (!token) {
-                errorMessageElement.textContent = "You must be logged in as an admin.";
+                errorMessageElement.textContent = "Peate olema sisseloginud administraatorina.";
                 return;
             }
 
@@ -40,7 +40,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const data = await response.json();
 
             if (data.success) {
-                successMessageElement.textContent = "Employee created successfully!";
+                successMessageElement.textContent = "Töötaja loodud edukalt!";
                 errorMessageElement.textContent = "";
             } else {
                 errorMessageElement.textContent = "❌ " + data.message;
@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         } catch (error) {
             console.error("Error creating employee:", error);
-            errorMessageElement.textContent = "An error occurred. Please try again.";
+            errorMessageElement.textContent = "Tekkis viga. Palun proovige uuesti.";
         }
     });
 });

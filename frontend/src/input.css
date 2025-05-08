@@ -1,1 +1,6 @@
 @import "tailwindcss";
+
+@theme {
+    --color-sigma: #006a8e;
+
+}

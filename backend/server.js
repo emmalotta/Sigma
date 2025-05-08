@@ -19,7 +19,6 @@ app.use(cors());
 app.use(bodyParser.json());
 
 
-// Set up MySQL connection
 const db = mysql.createConnection({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
@@ -35,7 +34,6 @@ db.connect((err) => {
 });
 
 
-// Middleware to verify JWT token
 const verifyToken = (req, res, next) => {
     const token = req.header("Authorization")?.replace("Bearer ", "");
 
@@ -60,7 +58,7 @@ const verifyToken = (req, res, next) => {
 };
 
 
-// Login route
+// LOGIN
 app.post("/api/login", (req, res) => {
     const { username, password } = req.body;
 
@@ -78,7 +76,6 @@ app.post("/api/login", (req, res) => {
             return res.status(401).json({ success: false, message: "Invalid username or password." });
         }
 
-        // Include role in token
         const token = jwt.sign({ username: user.username, role: user.role }, SECRET_KEY, { expiresIn: "1h" });
         res.json({ success: true, message: "Login successful!", token, role: user.role });
     });
@@ -86,9 +83,9 @@ app.post("/api/login", (req, res) => {
 
 
 
-// Add Employees (Admin)
+// ADD USER
 app.post("/api/create-employee", verifyToken, async (req, res) => {
-    console.log("🔹 Received Request:", req.body);  // Debugging
+    console.log("🔹 Received Request:", req.body);
 
     if (req.user.role !== "admin") {
         return res.status(403).json({ success: false, message: "Unauthorized. Admins only." });
@@ -96,7 +93,6 @@ app.post("/api/create-employee", verifyToken, async (req, res) => {
 
     const { newUsername, newPassword, role } = req.body;
 
-    // Default role
     const employeeRole = role || "machine_operator";
 
     try {
@@ -121,7 +117,7 @@ app.post("/api/create-employee", verifyToken, async (req, res) => {
 
 
 
-// Store new orders (Machine Operator)
+// ORDERS
 app.post("/api/orders", verifyToken, (req, res) => {
     if (req.user.role !== "machine_operator") {
         return res.status(403).json({ success: false, message: "Unauthorized. Only machine operators can create orders." });
@@ -136,7 +132,7 @@ app.post("/api/orders", verifyToken, (req, res) => {
 
     let replacementValue = null;
 
-    // Only use replacement_crate for crate_removal
+    // REMOVAL
     if (order_type === 'crate_removal') {
         if (replacement_crate !== 'yes' && replacement_crate !== 'no') {
             return res.status(400).json({ success: false, message: "replacement_crate must be 'yes' or 'no' for crate_removal." });
@@ -144,7 +140,6 @@ app.post("/api/orders", verifyToken, (req, res) => {
         replacementValue = replacement_crate;
     }
 
-    // Use different query depending on whether replacement_crate is relevant
     const query = order_type === 'crate_removal'
         ? "INSERT INTO orders (machine_operator, order_type, replacement_crate, additional_notes, status) VALUES (?, ?, ?, ?, 'pending')"
         : "INSERT INTO orders (machine_operator, order_type, additional_notes, status) VALUES (?, ?, ?, 'pending')";
