@@ -21,6 +21,7 @@ function showTab(tab) {
     fetchOrders();
 }
 
+// Fetch
 async function fetchOrders() {
     try {
         const response = await fetch('http://localhost:3000/api/orders', {
@@ -42,21 +43,32 @@ async function fetchOrders() {
             const completedOrders = data.orders.filter(order => order.status === 'completed');
 
             if (activeTab === 'pending') {
-                displayOrders(pendingOrders, 'Ootel tellimused');
+                pendingOrders.forEach(order => {
+                    const orderCard = createOrderCard(order);
+                    ordersContainer.appendChild(orderCard);
+                });
             } else if (activeTab === 'in-progress') {
-                displayOrders(inProgressOrders, 'Töös olevad tellimused');
-                //no worky
+                inProgressOrders.forEach(order => {
+                    const orderCard = createOrderCard(order);
+                    ordersContainer.appendChild(orderCard);
+                });
             } else if (activeTab === 'history') {
-                displayOrders(completedOrders, 'Ajalugu');
+                completedOrders.forEach(order => {
+                    const orderCard = createOrderCard(order);
+                    ordersContainer.appendChild(orderCard);
+                });
             } else {
                 showError("Tellimuste laadimine ebaõnnestus.");
             }
-
+        } else {
+            showError("Tellimuste laadimine ebaõnnestus.");
         }
     } catch (error) {
         console.error("Viga tellimuste laadimisel:", error);
         showError("Tellimuste laadimisel tekkis viga.");
     }
+    
+
 }
 
 
@@ -120,50 +132,6 @@ function createOrderCard(order) {
 
     return row;
 }
-
-
-
-// Fetch
-async function fetchOrders() {
-    try {
-        const response = await fetch('http://localhost:3000/api/orders', {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-
-            const ordersContainer = document.getElementById("orders-container");
-            ordersContainer.innerHTML = '';
-
-            const pendingOrders = data.orders.filter(order => order.status === 'pending');
-            const inProgressOrders = data.orders.filter(order => order.status === 'in_progress');
-
-            if (activeTab === 'pending') {
-                pendingOrders.forEach(order => {
-                    const orderCard = createOrderCard(order);
-                    ordersContainer.appendChild(orderCard);
-                });
-            } else if (activeTab === 'in-progress') {
-                inProgressOrders.forEach(order => {
-                    const orderCard = createOrderCard(order);
-                    ordersContainer.appendChild(orderCard);
-                });
-            }
-        } else {
-            showError("Tellimuste laadimine ebaõnnestus.");
-        }
-    } catch (error) {
-        console.error("Viga tellimuste laadimisel:", error);
-        showError("Tellimuste laadimisel tekkis viga.");
-    }
-}
-
-
 
 
 

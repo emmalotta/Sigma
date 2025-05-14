@@ -162,13 +162,13 @@ app.post("/api/orders", verifyToken, (req, res) => {
 
 
 
-// Retrieve all orders (both pending and in-progress) for Hall Workers
+// Retrieve all orders (pending, in-progress, and completed) for Hall Workers
 app.get("/api/orders", verifyToken, (req, res) => {
     if (req.user.role !== "hall_worker") {
         return res.status(403).json({ success: false, message: "Unauthorized. Only hall workers can view orders." });
     }
 
-    db.query("SELECT * FROM orders WHERE status IN ('pending', 'in_progress')", (err, results) => {
+    db.query("SELECT * FROM orders WHERE status IN ('pending', 'in_progress', 'completed')", (err, results) => {
         if (err) {
             console.error("Database Error:", err);
             return res.status(500).json({ success: false, message: "Database error" });
@@ -176,6 +176,7 @@ app.get("/api/orders", verifyToken, (req, res) => {
         res.json({ success: true, orders: results });
     });
 });
+
 
 
 
