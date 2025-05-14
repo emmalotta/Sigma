@@ -3,7 +3,6 @@ require("dotenv-safe").config({
     allowEmptyValues: true
 });
 
-
 const express = require("express");
 const mysql = require("mysql2");
 const cors = require("cors");
@@ -11,13 +10,11 @@ const jwt = require("jsonwebtoken");
 const bodyParser = require("body-parser");
 const bcrypt = require("bcryptjs");
 
-
 const app = express();
 const SECRET_KEY = process.env.SECRET_KEY;
 
 app.use(cors());
 app.use(bodyParser.json());
-
 
 const db = mysql.createConnection({
     host: process.env.DB_HOST,
@@ -26,37 +23,24 @@ const db = mysql.createConnection({
     database: process.env.DB_NAME,
 });
 
-
-
 db.connect((err) => {
     if (err) throw err;
     console.log("Connected to MySQL database!");
 });
 
-
 const verifyToken = (req, res, next) => {
     const token = req.header("Authorization")?.replace("Bearer ", "");
-
-    if (process.env.NODE_ENV === "development") {
-        console.log("Received Token:", token);
-    }
-
-
     if (!token) {
         return res.status(401).json({ success: false, message: "No token provided." });
     }
-
     try {
         const decoded = jwt.verify(token, SECRET_KEY);
-        console.log("Decoded Token:", decoded);
         req.user = decoded;
         next();
     } catch (err) {
-        console.error("Token Verification Failed:", err.message);
         res.status(401).json({ success: false, message: "Invalid token." });
     }
 };
-
 
 // LOGIN
 app.post("/api/login", (req, res) => {
@@ -159,10 +143,29 @@ app.post("/api/orders", verifyToken, (req, res) => {
     });
 });
 
+// Get machine operator's own orders
+app.get('/api/orders/my-orders', verifyToken, (req, res) => {
+    if (req.user.role !== "machine_operator") {
+        return res.status(403).json({ success: false, message: "Unauthorized. Only machine operators can view their orders." });
+    }
+
+    const machineOperator = req.user.username;
+
+    db.query("SELECT * FROM orders WHERE machine_operator = ?", [machineOperator], (err, results) => {
+        if (err) {
+            console.error("Database Error:", err);
+            return res.status(500).json({ success: false, message: "Database error" });
+        }
+        res.json({ success: true, orders: results });
+    });
+});
 
 
 
-// Retrieve all orders (pending, in-progress, and completed) for Hall Workers
+
+
+
+// Retrieve orders(Hall Workers)
 app.get("/api/orders", verifyToken, (req, res) => {
     if (req.user.role !== "hall_worker") {
         return res.status(403).json({ success: false, message: "Unauthorized. Only hall workers can view orders." });

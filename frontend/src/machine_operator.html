@@ -8,67 +8,76 @@
     <link href="./output.css" rel="stylesheet" />
 </head>
 
-<body
-    class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 flex justify-center items-center min-h-screen p-4">
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 flex justify-center items-center min-h-screen p-4">
     <div class="w-full max-w-2xl bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md">
-        <div class="flex justify-between items-center mb-6">
-            <h1 class="text-3xl font-bold text-center w-full">Uus töökäsk</h1>
+        <div class="flex flex-wrap mb-6">
+            <div class="flex flex-wrap justify-between gap-4 w-full">
+                <button id="order-tab" onclick="showTab('order')"
+                    class="px-5 py-3 bg-sigma text-white font-semibold rounded-lg hover:bg-blue-700 transition w-full sm:w-auto">
+                    Uus tellimus:
+                </button>
+                <button id="pending-tab" onclick="showTab('pending')"
+                    class="px-5 py-3 bg-gray-600 text-white font-semibold rounded-lg hover:bg-gray-700 transition w-full sm:w-auto">
+                    Ootelv tellimused
+                </button>
+                <button id="in-progress-tab" onclick="showTab('in-progress')"
+                    class="px-5 py-3 bg-gray-600 text-white font-semibold rounded-lg hover:bg-gray-700 transition w-full sm:w-auto">
+                    Töös tellimused
+                </button>
+                <button id="history-tab" onclick="showTab('history')"
+                    class="px-5 py-3 bg-gray-600 text-white font-semibold rounded-lg hover:bg-gray-700 transition w-full sm:w-auto">
+                    Ajalugu
+                </button>
+            </div>
         </div>
 
-        <form id="order-form" class="space-y-5">
-            <!-- Aadress -->
-            <div>
-                <label class="block font-semibold mb-2">Aadress:</label>
-                <div class="flex gap-3">
-                    <button type="button"
-                        class="order-btn bg-sigma text-white px-4 py-2 rounded-3xl hover:bg-blue-600">90</button>
-                    <button type="button"
-                        class="order-btn bg-sigma text-white px-4 py-2 rounded-3xl hover:bg-blue-600">99</button>
-                    <button type="button"
-                        class="order-btn bg-sigma text-white px-4 py-2 rounded-3xl hover:bg-blue-600">Muu</button>
+        <!-- Order Form Container -->
+        <div id="order-form-container" class="mt-4">
+            <form id="order-form" class="space-y-5">
+                <!-- Aadress -->
+                <div>
+                    <label class="block font-semibold mb-2">Aadress:</label>
+                    <div class="flex flex-wrap gap-3">
+                        <button type="button" class="order-btn bg-sigma text-white px-4 py-2 rounded-3xl hover:bg-blue-600 w-full sm:w-auto mb-2 sm:mb-0">90</button>
+                        <button type="button" class="order-btn bg-sigma text-white px-4 py-2 rounded-3xl hover:bg-blue-600 w-full sm:w-auto mb-2 sm:mb-0">99</button>
+                        <button type="button" class="order-btn bg-sigma text-white px-4 py-2 rounded-3xl hover:bg-blue-600 w-full sm:w-auto mb-2 sm:mb-0">Muu</button>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Töökäsk -->
-            <div>
-                <label class="block font-semibold mb-2">Töökäsk:</label>
-                <div class="flex flex-wrap gap-3">
-                    <button type="button"
-                        class="order-btn bg-sigma text-white px-4 py-2 rounded hover:bg-blue-600">Kumm</button>
-                    <button type="button"
-                        class="order-btn bg-sigma text-white px-4 py-2 rounded hover:bg-blue-600">Pakkematerjal</button>
-                    <button type="button"
-                        class="order-btn bg-sigma text-white px-4 py-2 rounded hover:bg-blue-600">Komponent</button>
-                    <button type="button"
-                        class="order-btn bg-sigma text-white px-4 py-2 rounded hover:bg-blue-600">Toodangu
-                        äraviimine</button>
+                <!-- Töökäsk -->
+                <div>
+                    <label class="block font-semibold mb-2">Töökäsk:</label>
+                    <div class="flex flex-wrap gap-3">
+                        <button type="button" class="order-btn bg-sigma text-white px-4 py-2 rounded hover:bg-blue-600 w-full sm:w-auto mb-2 sm:mb-0">Kumm</button>
+                        <button type="button" class="order-btn bg-sigma text-white px-4 py-2 rounded hover:bg-blue-600 w-full sm:w-auto mb-2 sm:mb-0">Pakkematerjal</button>
+                        <button type="button" class="order-btn bg-sigma text-white px-4 py-2 rounded hover:bg-blue-600 w-full sm:w-auto mb-2 sm:mb-0">Komponent</button>
+                        <button type="button" class="order-btn bg-sigma text-white px-4 py-2 rounded hover:bg-blue-600 w-full sm:w-auto mb-2 sm:mb-0">Toodangu äraviimine</button>
+                    </div>
+                    <input type="hidden" id="order-type" name="order_type" />
                 </div>
-                <input type="hidden" id="order-type" name="order_type" />
-            </div>
 
-            <!-- Uus kast -->
-            <div id="replacement-crate-section" class="hidden">
-                <label class="block font-semibold mb-2">Kas on vaja uut kasti?</label>
-                <label class="inline-flex items-center">
-                    <input type="checkbox" id="replacement-crate" class="mr-2" />
-                    <span>Too uus kast</span>
-                </label>
-            </div>
+                <!-- Uus kast -->
+                <div id="replacement-crate-section" class="hidden">
+                    <label class="block font-semibold mb-2">Kas on vaja uut kasti?</label>
+                    <label class="inline-flex items-center">
+                        <input type="checkbox" id="replacement-crate" class="mr-2" />
+                        <span>Too uus kast</span>
+                    </label>
+                </div>
 
-            <!-- Märkused -->
-            <div>
-                <label for="additional-notes" class="block font-semibold mb-2">Märkused (valikuline):</label>
-                <textarea id="additional-notes"
-                    class="border dark:border-gray-700 bg-white dark:bg-gray-700 p-2 w-full rounded" rows="3"
-                    placeholder="Kirjuta siia..."></textarea>
-            </div>
+                <!-- Märkused -->
+                <div>
+                    <label for="additional-notes" class="block font-semibold mb-2">Märkused (valikuline):</label>
+                    <textarea id="additional-notes" class="border dark:border-gray-700 bg-white dark:bg-gray-700 p-2 w-full rounded" rows="3" placeholder="Kirjuta siia..."></textarea>
+                </div>
 
-            <!-- Submit -->
-            <button type="submit" class="bg-sigma text-white px-4 py-2 rounded w-full hover:bg-blue-600">
-                Saada tellimus
-            </button>
-        </form>
+                <!-- Submit -->
+                <button type="submit" class="bg-sigma text-white px-4 py-2 rounded w-full hover:bg-blue-600">Saada tellimus</button>
+            </form>
+        </div>
 
+        <!-- Orders Container (outside of the form container) -->
+        <div id="orders-container" class="mt-4"></div>
     </div>
 
     <script>

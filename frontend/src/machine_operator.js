@@ -7,7 +7,109 @@ if (!token) {
 
 }
 
-let selectedOrderType = null;
+// Function to create an order card
+function createOrderCard(order) {
+    const card = document.createElement("div");
+    card.classList.add("p-4", "mb-2", "bg-gray-200", "dark:bg-gray-700", "rounded-lg");
+
+    const orderType = document.createElement("p");
+    orderType.textContent = `Tellimuse tüüp: ${order.order_type}`;
+
+    const status = document.createElement("p");
+    status.textContent = `Staatus: ${order.status}`;
+
+    const notes = document.createElement("p");
+    notes.textContent = `Märkused: ${order.additional_notes || "Puudub"}`;
+
+    card.appendChild(orderType);
+    card.appendChild(status);
+    card.appendChild(notes);
+
+    return card;
+}
+
+
+let activeTab = 'order';
+
+
+function showTab(tab) {
+    // Update the active tab variable
+    activeTab = tab;
+
+    // Hide all tab contents
+    const orderForm = document.getElementById('order-form-container');
+    const ordersContainer = document.getElementById('orders-container');
+
+    orderForm.classList.add('hidden');
+    ordersContainer.innerHTML = ''; // Clear previous orders
+
+    // Reset button colors
+    const tabs = ['order', 'pending', 'in-progress', 'history'];
+    tabs.forEach(t => {
+        document.getElementById(`${t}-tab`).classList.replace('bg-sigma', 'bg-gray-600');
+    });
+
+    // Highlight the active tab
+    document.getElementById(`${tab}-tab`).classList.replace('bg-gray-600', 'bg-sigma');
+
+    // Show the selected tab content
+    if (tab === 'order') {
+        orderForm.classList.remove('hidden');
+    } else {
+        ordersContainer.classList.remove('hidden');
+        fetchOrders(tab);
+    }
+}
+
+
+
+
+// Fetch
+async function fetchOrders() {
+    try {
+        const response = await fetch('http://localhost:3000/api/orders/my-orders', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error ${response.status}: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+
+        if (data.success) {
+            const ordersContainer = document.getElementById("orders-container");
+            if (ordersContainer) {
+                ordersContainer.innerHTML = '';
+            } else {
+                console.error("Element with ID 'orders-container' not found.");
+            }
+
+
+            const pendingOrders = data.orders.filter(order => order.status === 'pending');
+            const inProgressOrders = data.orders.filter(order => order.status === 'in_progress');
+            const completedOrders = data.orders.filter(order => order.status === 'completed');
+
+            const ordersToDisplay = (activeTab === 'pending') ? pendingOrders :
+                                   (activeTab === 'in-progress') ? inProgressOrders :
+                                   (activeTab === 'history') ? completedOrders : [];
+
+            ordersToDisplay.forEach(order => {
+                const orderCard = createOrderCard(order);
+                ordersContainer.appendChild(orderCard);
+            });
+        } else {
+            alert("Tellimuste laadimine ebaõnnestus: " + data.message);
+        }
+    } catch (error) {
+        console.error("Viga tellimuste laadimisel:", error);
+    }
+}
+
+
 
 
 document.querySelectorAll('.order-btn').forEach(btn => {
