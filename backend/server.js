@@ -9,13 +9,13 @@ const jwt = require("jsonwebtoken");
 const bodyParser = require("body-parser");
 const bcrypt = require("bcryptjs");
 const helmet = require("helmet");
-
 const morgan = require("morgan");
-app.use(morgan("combined")); // logs HTTP requests
 
 
 const app = express();
 app.use(helmet());
+app.use(morgan("combined"));
+
 
 const SECRET_KEY = process.env.SECRET_KEY;
 
@@ -79,7 +79,7 @@ app.post("/api/login", (req, res) => {
 
 // ADD USER
 app.post("/api/create-employee", verifyToken, async (req, res) => {
-    console.log("🔹 Received Request:", req.body);
+    console.log("Received Request:", req.body);
 
     if (req.user.role !== "admin") {
         return res.status(403).json({ success: false, message: "Unauthorized. Admins only." });
@@ -250,14 +250,12 @@ app.put("/api/orders/:id", verifyToken, (req, res) => {
 });
 
 
-const path = require("path");
-
-// Serve static frontend files
 app.use(express.static(path.join(__dirname, "frontend", "dist")));
 
 app.get("*", (req, res) => {
     res.sendFile(path.join(__dirname, "frontend", "dist", "index.html"));
 });
+
 
 
 const PORT = process.env.PORT || 3000;
