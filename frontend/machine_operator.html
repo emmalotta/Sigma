@@ -12,19 +12,19 @@
     <div class="w-full max-w-2xl bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md">
         <div class="flex flex-wrap mb-6">
             <div class="flex flex-wrap justify-between gap-4 w-full">
-                <button id="order-tab" onclick="showTab('order')"
+                <button id="order-tab"
                     class="px-5 py-3 bg-sigma text-white font-semibold rounded-lg hover:bg-blue-700 transition w-full sm:w-auto">
                     Uus tellimus:
                 </button>
-                <button id="pending-tab" onclick="showTab('pending')"
+                <button id="pending-tab"
                     class="px-5 py-3 bg-gray-600 text-white font-semibold rounded-lg hover:bg-gray-700 transition w-full sm:w-auto">
                     Ootel tellimused
                 </button>
-                <button id="in-progress-tab" onclick="showTab('in-progress')"
+                <button id="in-progress-tab"
                     class="px-5 py-3 bg-gray-600 text-white font-semibold rounded-lg hover:bg-gray-700 transition w-full sm:w-auto">
                     Töös tellimused
                 </button>
-                <button id="history-tab" onclick="showTab('history')"
+                <button id="history-tab"
                     class="px-5 py-3 bg-gray-600 text-white font-semibold rounded-lg hover:bg-gray-700 transition w-full sm:w-auto">
                     Ajalugu
                 </button>
@@ -47,12 +47,13 @@
                 <!-- Töökäsk -->
                 <div>
                     <label class="block font-semibold mb-2">Töökäsk:</label>
-                    <div class="flex flex-wrap gap-3">
-                        <button type="button" class="order-btn bg-sigma text-white px-4 py-2 rounded hover:bg-blue-600 w-full sm:w-auto mb-2 sm:mb-0">Kumm</button>
-                        <button type="button" class="order-btn bg-sigma text-white px-4 py-2 rounded hover:bg-blue-600 w-full sm:w-auto mb-2 sm:mb-0">Pakkematerjal</button>
-                        <button type="button" class="order-btn bg-sigma text-white px-4 py-2 rounded hover:bg-blue-600 w-full sm:w-auto mb-2 sm:mb-0">Komponent</button>
-                        <button type="button" class="order-btn bg-sigma text-white px-4 py-2 rounded hover:bg-blue-600 w-full sm:w-auto mb-2 sm:mb-0">Toodangu äraviimine</button>
-                    </div>
+                        <div class="flex flex-wrap gap-3">
+                            <button type="button" data-type="rubber" class="order-btn  bg-sigma text-white px-4 py-2 rounded hover:bg-blue-600 w-full sm:w-auto mb-2 sm:mb-0" data-type="kumm">Kumm</button>
+                            <button type="button" data-type="packaging" class="order-btn bg-sigma text-white px-4 py-2 rounded hover:bg-blue-600 w-full sm:w-auto mb-2 sm:mb-0" data-type="pakkematerjal">Pakkematerjal</button>
+                            <button type="button" data-type="component" class="order-btn bg-sigma text-white px-4 py-2 rounded hover:bg-blue-600 w-full sm:w-auto mb-2 sm:mb-0" data-type="komponent">Komponent</button>
+                            <button type="button" data-type="crate_removal" class="order-btn bg-sigma text-white px-4 py-2 rounded hover:bg-blue-600 w-full sm:w-auto mb-2 sm:mb-0" data-type="toodangu_äraviimine">Toodangu äraviimine</button>
+                        </div>
+
                     <input type="hidden" id="order-type" name="order_type" />
                 </div>
 
@@ -85,7 +86,7 @@
             document.documentElement.classList.toggle('dark');
         }
     </script>
-    <script src="machine_operator.js"></script>
+    <script type="module" src="machine_operator.js"></script>
 </body>
 
 </html>

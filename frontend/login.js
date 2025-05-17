@@ -5,6 +5,8 @@ const passwordInput = document.getElementById("password");
 const loginButton = document.getElementById("login");
 
 
+
+
 form.addEventListener("submit", async function (event) {
     event.preventDefault();
 

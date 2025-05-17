@@ -8,5 +8,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "start": "node app.js"
+  },
+  "devDependencies": {
+    "vite": "^6.3.5"
   }
 }

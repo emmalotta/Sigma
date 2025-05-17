@@ -6,7 +6,6 @@ if (!token) {
 
 let activeTab = 'pending';
 
-
 function showTab(tab) {
     activeTab = tab;
 
@@ -17,14 +16,16 @@ function showTab(tab) {
     document.getElementById('history-tab').classList.toggle('bg-blue-600', tab === 'history');
     document.getElementById('history-tab').classList.toggle('bg-gray-600', tab !== 'history');
 
-
     fetchOrders();
 }
+
+// Make showTab globally accessible for inline onclick in HTML
+window.showTab = showTab;
 
 // Fetch
 async function fetchOrders() {
     try {
-        const response = await fetch('http://localhost:3000/api/orders', {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/orders`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -34,7 +35,6 @@ async function fetchOrders() {
         const data = await response.json();
 
         if (data.success) {
-
             const ordersContainer = document.getElementById("orders-container");
             ordersContainer.innerHTML = '';
 
@@ -67,10 +67,7 @@ async function fetchOrders() {
         console.error("Viga tellimuste laadimisel:", error);
         showError("Tellimuste laadimisel tekkis viga.");
     }
-    
-
 }
-
 
 // Display orders
 function displayOrders(orders, sectionTitle) {
@@ -133,12 +130,10 @@ function createOrderCard(order) {
     return row;
 }
 
-
-
-//MARK ORDER RECEIVED
+// MARK ORDER RECEIVED (if you still need this, otherwise you can remove it)
 async function markOrderReceived(orderId) {
     try {
-        const response = await fetch(`http://localhost:3000/api/orders/received/${orderId}`, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/orders/received/${orderId}`, {
             method: 'PUT',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -161,35 +156,10 @@ async function markOrderReceived(orderId) {
     }
 }
 
-// MARK ORDER IN PROGRESS
-async function markOrderInProgress(orderId) {
-    try {
-        const response = await fetch(`http://localhost:3000/api/orders/${orderId}`, {
-            method: 'PUT',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ status: 'in_progress' })
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-            alert("Tellimus liikus töösse!");
-            fetchOrders(); // Refresh the order list
-        } else {
-            showError("Tellimuse liikumisel töösse tekkis viga.");
-        }
-    } catch (error) {
-        console.error("Viga tellimuse liikumisel töösse:", error);
-        showError("Tellimuse liikumisel töösse tekkis viga.");
-    }
-}
-
+// GENERIC function to update order status
 async function updateOrderStatus(orderId, newStatus) {
     try {
-        const response = await fetch(`http://localhost:3000/api/orders/${orderId}`, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/orders/${orderId}`, {
             method: 'PUT',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -212,7 +182,8 @@ async function updateOrderStatus(orderId, newStatus) {
     }
 }
 
-// Using the generic update function for both buttons
+
+// Use the generic update function for all status changes
 function markOrderPending(orderId) {
     updateOrderStatus(orderId, 'pending');
 }
@@ -225,12 +196,7 @@ function markOrderInProgress(orderId) {
     updateOrderStatus(orderId, 'in_progress');
 }
 
-
-
-
-
-
-// Error
+// Error display
 function showError(message) {
     const ordersContainer = document.getElementById("orders-container");
     ordersContainer.innerHTML = `
@@ -239,7 +205,6 @@ function showError(message) {
         </tr>
     `;
 }
-
 
 document.addEventListener("DOMContentLoaded", () => {
     showTab('pending');
