@@ -1,4 +1,3 @@
-require("dotenv").config();
 require("dotenv-safe").config({
     allowEmptyValues: true
 });
@@ -9,8 +8,15 @@ const cors = require("cors");
 const jwt = require("jsonwebtoken");
 const bodyParser = require("body-parser");
 const bcrypt = require("bcryptjs");
+const helmet = require("helmet");
+
+const morgan = require("morgan");
+app.use(morgan("combined")); // logs HTTP requests
+
 
 const app = express();
+app.use(helmet());
+
 const SECRET_KEY = process.env.SECRET_KEY;
 
 app.use(cors());
@@ -24,8 +30,12 @@ const db = mysql.createConnection({
 });
 
 db.connect((err) => {
-    if (err) throw err;
-    console.log("Connected to MySQL database!");
+    if (err) {
+        console.error("MySQL connection error:", err);
+        process.exit(1);
+    } else {
+        console.log("Connected to MySQL database!");
+    }
 });
 
 const verifyToken = (req, res, next) => {
@@ -240,9 +250,17 @@ app.put("/api/orders/:id", verifyToken, (req, res) => {
 });
 
 
+const path = require("path");
+
+// Serve static frontend files
+app.use(express.static(path.join(__dirname, "frontend", "dist")));
+
+app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "frontend", "dist", "index.html"));
+});
 
 
-
-app.listen(3000, () => {
-    console.log("Server running on http://localhost:3000");
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
 });
