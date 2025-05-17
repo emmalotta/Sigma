@@ -2,12 +2,10 @@
   "dependencies": {
     "@tailwindcss/cli": "^4.0.9",
     "tailwindcss": "^4.0.9"
-  },
-"scripts": {
+  },"scripts": {
   "dev": "vite",
   "build": "vite build",
   "preview": "vite preview",
   "start": "node app.js"
 }
-
 }
