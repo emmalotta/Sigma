@@ -268,12 +268,8 @@ app.put("/api/orders/:id", verifyToken, (req, res) => {
 
 
 
+app.use(express.static(path.join(__dirname, '../frontend')));
 
-app.use(express.static(path.join(__dirname, 'public')));  // or your actual frontend folder
-
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/index.html'));
 });
-
-const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
