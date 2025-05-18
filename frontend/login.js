@@ -1,4 +1,3 @@
-// Select the form and input elements
 const form = document.querySelector("form");
 const usernameInput = document.getElementById("username");
 const passwordInput = document.getElementById("password");
@@ -10,11 +9,11 @@ const loginButton = document.getElementById("login");
 form.addEventListener("submit", async function (event) {
     event.preventDefault();
 
-    // Get values from username and password input
+
     const username = usernameInput.value.trim();
     const password = passwordInput.value.trim();
 
-    // Validate username and password
+
     if (username === "") {
         alert("Please enter a username.");
         return;
@@ -26,7 +25,7 @@ form.addEventListener("submit", async function (event) {
     }
 
     try {
-        // Send credentials to backend API for validation
+        
         const response = await fetch(`${import.meta.env.VITE_API_URL}/api/login`, {
             method: "POST",
             headers: {
@@ -35,7 +34,6 @@ form.addEventListener("submit", async function (event) {
             body: JSON.stringify({ username, password }),
         });
 
-        // Parse the response
         const data = await response.json();
 
         const errorMessageElement = document.getElementById("error-message");
@@ -64,7 +62,7 @@ form.addEventListener("submit", async function (event) {
     }
 });
 
-// Enter
+
 form.addEventListener("keypress", function (event) {
     if (event.key === "Enter") {
         loginButton.click();
