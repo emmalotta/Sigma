@@ -1,0 +1,7 @@
+RewriteEngine On
+
+# Proxy API requests to backend
+RewriteCond %{REQUEST_URI} ^/api/
+RewriteRule ^(.*)$ http://localhost:3000/$1 [P,L]
+
+# Everything else is served by Apache from static files (no proxy)
