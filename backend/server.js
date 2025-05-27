@@ -24,24 +24,16 @@ const SECRET_KEY = process.env.SECRET_KEY;
 app.use(cors());
 app.use(bodyParser.json());
 
-const db = mysql.createConnection({
+const db = mysql.createPool({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
 });
 
-const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
-db.connect((err) => {
-    if (err) {
-        console.error("MySQL connection error:", err);
-        process.exit(1);
-    } else {
-        console.log("Connected to MySQL database!");
-    }
-});
 
 const verifyToken = (req, res, next) => {
     const authHeader = req.headers['authorization'] || req.headers['Authorization'];
@@ -58,7 +50,6 @@ const verifyToken = (req, res, next) => {
         return res.status(401).json({ success: false, message: "Invalid token." });
     }
 };
-
 
 
 
@@ -172,8 +163,6 @@ app.post("/api/orders", verifyToken, (req, res) => {
         res.json({ success: true, message: "Order received!", orderId: result.insertId });
     });
 });
-
-const { verifyToken, requireRole } = require('./auth');
 
 
 // Get orders (hall workers see all, machine operators see only their own)
