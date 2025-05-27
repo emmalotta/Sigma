@@ -1,4 +1,11 @@
-RewriteEngine On
+# Set default index file inside dist folder
+DirectoryIndex dist/index.html
 
-RewriteCond %{REQUEST_URI} ^/api/
-RewriteRule ^(.\*)$ http://localhost:3000/$1 [P,L]
+# Serve existing files and directories as-is (from frontend folder)
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# For everything else, internally rewrite to dist/
+RewriteRule ^(.*)$ dist/$1 [L]
+
