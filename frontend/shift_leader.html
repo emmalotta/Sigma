@@ -1,11 +1,51 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="et" class="dark">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vahetuse juht – Tellimused</title>
+    <link href="./output.css" rel="stylesheet" />
 </head>
-<body>
-    
+
+<body
+    class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 min-h-screen flex justify-center items-start p-6">
+
+    <div class="w-full max-w-4xl bg-white dark:bg-gray-800 p-8 rounded-xl shadow-xl mt-10">
+        <h1 class="text-4xl font-bold mb-8 text-center text-gray-800 dark:text-gray-100">Tellimused</h1>
+
+        <!-- Tab Navigation -->
+        <div class="flex justify-center space-x-4 mb-8">
+            <button id="pending-tab" class="px-5 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition">
+                Ootel tellimused
+            </button>
+            <button id="in-progress-tab" class="px-5 py-3 bg-gray-600 text-white font-semibold rounded-lg hover:bg-gray-700 transition">
+                Töös olevad tellimused
+            </button>
+            <button id="history-tab" class="px-5 py-3 bg-gray-600 text-white font-semibold rounded-lg hover:bg-gray-700 transition">
+                Ajalugu
+            </button>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="min-w-full bg-gray-100 dark:bg-gray-700 rounded-lg shadow">
+                <thead>
+                    <tr class="bg-gray-300 dark:bg-gray-600">
+                        <th class="p-4 font-semibold">Operaator</th>
+                        <th class="p-4 font-semibold">Tellimuse tüüp</th>
+                        <th class="p-4 font-semibold">Uus kast</th>
+                        <th class="p-4 font-semibold">Märkused</th>
+                        <th class="p-4 font-semibold">Staatus</th>
+                    </tr>
+                </thead>
+                <tbody id="orders-container" class="text-center text-gray-900 dark:text-gray-100">
+                    <!-- Orders will be injected here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script type="module" src="shift_leader.js"></script>
 </body>
+
 </html>

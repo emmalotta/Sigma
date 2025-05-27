@@ -176,11 +176,12 @@ app.post("/api/orders", verifyToken, (req, res) => {
 
 // Get orders (hall workers see all, machine operators see only their own)
 app.get('/api/orders', verifyToken, (req, res) => {
+    console.log("User from token:", req.user);  // Add this
     const role = req.user.role;
     const username = req.user.username;
 
-    if (role === 'hall_worker') {
-        // Hall workers see ALL orders
+    if (role === 'hall_worker' || role === 'shift_leader') {
+        // Hall workers and shift leaders see ALL orders
         db.query("SELECT * FROM orders", (err, results) => {
             if (err) {
                 console.error("Database error:", err);
@@ -198,9 +199,11 @@ app.get('/api/orders', verifyToken, (req, res) => {
             res.json({ success: true, orders: results });
         });
     } else {
-        return res.status(403).json({ success: false, message: "Unauthorized. Only hall workers and machine operators can view orders." });
+        return res.status(403).json({ success: false, message: "Unauthorized. Only hall workers, shift leaders and machine operators can view orders." });
     }
 });
+
+
 
 
 

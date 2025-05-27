@@ -42,13 +42,17 @@ form.addEventListener("submit", async function (event) {
             localStorage.setItem("authToken", data.token);
             localStorage.setItem("userRole", data.role);
 
-            if (data.role === "admin") {
-                window.location.href = "admin.html";
-            } else if (data.role === "machine_operator") {
-                window.location.href = "machine_operator.html";
-            } else {
-                window.location.href = "hall_worker.html";
-            }
+        if (data.role === 'admin') {
+        window.location.href = '/admin.html';
+        } else if (data.role === 'machine_operator') {
+        window.location.href = '/machine_operator.html';
+        } else if (data.role === 'hall_worker') {
+        window.location.href = '/hall_worker.html';
+        } else if (data.role === 'shift_leader') {
+        window.location.href = '/shift_leader.html';
+        } else {
+        window.location.href = '/hall_worker.html';
+        }
 
         } else {
             errorMessageElement.textContent = data.message;

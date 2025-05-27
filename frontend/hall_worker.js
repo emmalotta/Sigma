@@ -4,6 +4,19 @@ if (!token) {
     window.location.href = "login.html";
 }
 
+document.addEventListener("DOMContentLoaded", () => {
+    const pendingTab = document.getElementById("pending-tab");
+    const inProgressTab = document.getElementById("in-progress-tab");
+    const historyTab = document.getElementById("history-tab");
+
+    pendingTab.addEventListener("click", () => showTab("pending"));
+    inProgressTab.addEventListener("click", () => showTab("in-progress"));
+    historyTab.addEventListener("click", () => showTab("history"));
+
+    showTab("pending");
+});
+
+
 let activeTab = 'pending';
 
 function showTab(tab) {
@@ -19,8 +32,6 @@ function showTab(tab) {
     fetchOrders();
 }
 
-// Make showTab globally accessible for inline onclick in HTML
-window.showTab = showTab;
 
 // Fetch
 async function fetchOrders() {
@@ -57,8 +68,6 @@ async function fetchOrders() {
                     const orderCard = createOrderCard(order);
                     ordersContainer.appendChild(orderCard);
                 });
-            } else {
-                showError("Tellimuste laadimine ebaõnnestus.");
             }
         } else {
             showError("Tellimuste laadimine ebaõnnestus.");
@@ -130,31 +139,6 @@ function createOrderCard(order) {
     return row;
 }
 
-// MARK ORDER RECEIVED (if you still need this, otherwise you can remove it)
-async function markOrderReceived(orderId) {
-    try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/orders/received/${orderId}`, {
-            method: 'PUT',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-            alert("Tellimus märgiti vastu võetuks!");
-            // After marking as received, move to in-progress
-            moveOrderToInProgress(orderId);
-        } else {
-            showError("Tellimuse märkimine ebaõnnestus.");
-        }
-    } catch (error) {
-        console.error("Viga tellimuse märkimisel:", error);
-        showError("Tellimuse märkimisel tekkis viga.");
-    }
-}
 
 // GENERIC function to update order status
 async function updateOrderStatus(orderId, newStatus) {
@@ -173,9 +157,8 @@ async function updateOrderStatus(orderId, newStatus) {
         if (data.success) {
             alert(`Tellimuse staatus muudetud: ${newStatus}!`);
             fetchOrders(); // Refresh the list
-        } else {
-            showError(`Tellimuse staatuse muutmine ebaõnnestus: ${data.message}`);
         }
+
     } catch (error) {
         console.error(`Viga tellimuse staatuse muutmisel:`, error);
         showError("Tellimuse staatuse muutmisel tekkis viga.");
@@ -196,16 +179,13 @@ function markOrderInProgress(orderId) {
     updateOrderStatus(orderId, 'in_progress');
 }
 
-// Error display
+//ERROR
 function showError(message) {
     const ordersContainer = document.getElementById("orders-container");
     ordersContainer.innerHTML = `
         <tr>
-            <td colspan="4" class="p-4 text-red-500 text-center">${message}</td>
+            <td colspan="5" class="p-4 text-red-500 text-center">${message}</td>
         </tr>
     `;
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-    showTab('pending');
-});
