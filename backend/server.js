@@ -61,6 +61,7 @@ const verifyToken = (req, res, next) => {
 
 
 
+
 // LOGIN
 app.post("/api/login", (req, res) => {
     const { username, password } = req.body;
@@ -172,6 +173,7 @@ app.post("/api/orders", verifyToken, (req, res) => {
     });
 });
 
+const { verifyToken, requireRole } = require('./auth');
 
 
 // Get orders (hall workers see all, machine operators see only their own)
