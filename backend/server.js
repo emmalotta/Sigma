@@ -34,6 +34,18 @@ const db = mysql.createPool({
     queueLimit: 0
 });
 
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+// db.connect((err) => {
+//     if (err) {
+//         console.error("MySQL connection error:", err);
+//         process.exit(1);
+//     } else {
+//         console.log("Connected to MySQL database!");
+//     }
+// });
+
 
 const verifyToken = (req, res, next) => {
     const authHeader = req.headers['authorization'] || req.headers['Authorization'];
