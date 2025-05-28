@@ -1,0 +1,8 @@
+{
+    "apps" : [{
+    "name" : "sigma",
+    "script" : "server.js",
+    "watch" : true,
+    "cwd" : "~/domeenid/www.ta23rand.itmajakas.ee/sigma/backend"
+    }]
+   }
