@@ -3,6 +3,6 @@
     "name" : "sigma",
     "script" : "server.js",
     "watch" : true,
-    "cwd" : "~/domeenid/www.ta23rand.itmajakas.ee/sigma/backend"
+    "cwd" : "/data01/virt123070/domeenid/www.ta23rand.itmajakas.ee/sigma/backend"
     }]
    }
