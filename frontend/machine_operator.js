@@ -9,15 +9,14 @@ if (!token) {
 let activeTab = 'pending';
 let cachedOrders = [];
 
-// Show the selected tab and load orders if needed
+// DEFAULT TAB
 function showTab(tab) {
     activeTab = tab;
 
-    // Show/hide content containers
+
     document.getElementById('order-form-container').style.display = (tab === 'order') ? 'block' : 'none';
     document.getElementById('orders-container').style.display = (tab === 'order') ? 'none' : 'block';
 
-    // Highlight active tab button
     ['order-tab', 'pending-tab', 'in-progress-tab', 'history-tab'].forEach(id => {
         const btn = document.getElementById(id);
         if (!btn) return;
@@ -39,7 +38,7 @@ function showTab(tab) {
 }
 
 
-// Fetch orders from API if not cached, then render
+// FETCH ORDERS
 async function fetchOrders() {
     const ordersContainer = document.getElementById("orders-container");
     ordersContainer.innerHTML = `<tr><td colspan="5" class="p-4 text-center">Laadimine...</td></tr>`;
@@ -71,7 +70,7 @@ async function fetchOrders() {
     renderOrders();
 }
 
-// Render orders based on activeTab and cachedOrders
+// RENDER ORDERS
 function renderOrders() {
     const ordersContainer = document.getElementById("orders-container");
     ordersContainer.innerHTML = ''; // clear previous content
@@ -95,7 +94,7 @@ function renderOrders() {
     const table = document.createElement('table');
     table.className = 'w-full text-left rounded-lg overflow-hidden shadow-md';
 
-    // Table header
+    // TABLE HEAD
     table.innerHTML = `
         <thead class="bg-sigma text-white">
             <tr>
@@ -108,13 +107,13 @@ function renderOrders() {
         </thead>
     `;
 
-    // Table body container
+    // TABLE BODY
     const tbody = document.createElement('tbody');
 
-    // Create rows
+    // ROWS
     ordersToDisplay.forEach((order, index) => {
         const tr = document.createElement('tr');
-        // alternate row colors
+
         tr.className = index % 2 === 0 ? 'bg-gray-100 dark:bg-gray-700' : 'bg-white dark:bg-gray-800';
 
         let orderType = order.order_type === "material_order" ? "Materjalitellimus" :
@@ -138,7 +137,7 @@ function renderOrders() {
 }
 
 
-// Create order card row
+// CREATE ORDER CARD
 function createOrderCard(order) {
     const row = document.createElement("tr");
     row.className = "bg-gray-100 dark:bg-gray-700 transition";
@@ -187,7 +186,7 @@ function createOrderCard(order) {
     return row;
 }
 
-// Update order status on backend and locally
+// UPDATE ORDER STATUS
 async function updateOrderStatus(orderId, newStatus) {
     try {
         const response = await fetch(`${import.meta.env.VITE_API_URL}/api/orders/${orderId}`, {
@@ -204,7 +203,6 @@ async function updateOrderStatus(orderId, newStatus) {
         if (data.success) {
             alert(`Tellimuse staatus muudetud: ${newStatus}!`);
 
-            // Update cachedOrders locally to reflect changes instantly
             const orderIndex = cachedOrders.findIndex(order => order.id === orderId);
             if (orderIndex !== -1) {
                 cachedOrders[orderIndex].status = newStatus;
@@ -219,7 +217,7 @@ async function updateOrderStatus(orderId, newStatus) {
     }
 }
 
-// Specific status update functions
+// STATUS UPDATES
 function markOrderPending(orderId) {
     updateOrderStatus(orderId, 'pending');
 }
@@ -232,7 +230,6 @@ function markOrderInProgress(orderId) {
     updateOrderStatus(orderId, 'in_progress');
 }
 
-// Show error message in orders container
 function showError(message) {
     const ordersContainer = document.getElementById("orders-container");
     ordersContainer.innerHTML = `
@@ -242,36 +239,33 @@ function showError(message) {
     `;
 }
 
-// Event listeners for tab buttons
+// EVENT LISTENERS
 document.addEventListener("DOMContentLoaded", () => {
-  const orderForm = document.getElementById("order-form");  // <-- Added this!
+  const orderForm = document.getElementById("order-form");
   const orderTypeButtons = document.querySelectorAll(".order-btn");
   const orderTypeInput = document.getElementById("order-type");
   const replacementCrateSection = document.getElementById("replacement-crate-section");
   const replacementCrateCheckbox = document.getElementById("replacement-crate");
-  const additionalNotes = document.getElementById("additional-notes"); // you also use additionalNotes
+  const additionalNotes = document.getElementById("additional-notes");
 
   let selectedOrderType = "";
 
   orderTypeButtons.forEach(button => {
     button.addEventListener("click", () => {
-      // Remove highlight from all buttons
+
       orderTypeButtons.forEach(btn => {
         btn.classList.remove("bg-blue-700", "text-white");
-        btn.classList.add("bg-sigma");  // reset to default bg-sigma if needed
+        btn.classList.add("bg-sigma");
       });
 
-      // Add highlight to clicked button
       button.classList.add("bg-blue-700", "text-white");
       button.classList.remove("bg-sigma");
 
-      // Update selected order type value
       selectedOrderType = button.getAttribute("data-type");
       if (orderTypeInput) {
         orderTypeInput.value = selectedOrderType;
       }
 
-      // Show/hide replacement crate section based on order type
       if (selectedOrderType === "crate_removal") {
         replacementCrateSection.classList.remove("hidden");
       } else {
@@ -292,10 +286,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const sendReplacementCrate = replacementCrateCheckbox.checked ? "yes" : "no";
     const notes = additionalNotes.value.trim();
-
     const token = localStorage.getItem("authToken");
-
-    // Build orderData conditionally
     const orderData = {
         order_type: selectedOrderType,
         additional_notes: notes,
@@ -338,7 +329,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
-// Setup event listeners once after DOM content loaded
+// TAB NAVIGATION
 document.addEventListener("DOMContentLoaded", () => {
     document.getElementById('order-tab').addEventListener('click', () => showTab('order'));
     document.getElementById('pending-tab').addEventListener('click', () => showTab('pending'));

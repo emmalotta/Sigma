@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 successMessageElement.textContent = "Töötaja loodud edukalt!";
                 errorMessageElement.textContent = "";
             } else {
-                errorMessageElement.textContent = "❌ " + data.message;
+                errorMessageElement.textContent = "❌" + data.message;
                 successMessageElement.textContent = "";
             }
         } catch (error) {

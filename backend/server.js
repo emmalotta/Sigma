@@ -124,7 +124,7 @@ app.post("/api/create-employee", verifyToken, async (req, res) => {
 
 
 
-// Create order (Machine Operators) 
+// CREATE ORDER (Machine Operators) 
 app.post("/api/orders", verifyToken, (req, res) => {
     console.log("Received Order Data:", req.body);  // Debugging log
 
@@ -139,14 +139,14 @@ app.post("/api/orders", verifyToken, (req, res) => {
 
     console.log("Parsed Data - order_type:", order_type, "replacement_crate:", replacement_crate, "additional_notes:", additional_notes);
 
-    // Validate order type
+
     const validOrderTypes = ['crate_removal', 'rubber', 'packaging', 'component'];
     if (!order_type || !validOrderTypes.includes(order_type)) {
         console.log("Invalid order type:", order_type);  // Debugging log
         return res.status(400).json({ success: false, message: "Invalid order type." });
     }
 
-    // Handle replacement crate field only for crate_removal
+    // REPLACEMENT CRATE
     let replacementCrateValue = null;
     if (order_type === 'crate_removal') {
         if (replacement_crate !== 'yes' && replacement_crate !== 'no') {
@@ -156,7 +156,6 @@ app.post("/api/orders", verifyToken, (req, res) => {
         replacementCrateValue = replacement_crate;
     }
 
-    // Prepare the order data
     const orderData = {
         order_type,
         replacement_crate: replacementCrateValue,
@@ -165,7 +164,6 @@ app.post("/api/orders", verifyToken, (req, res) => {
         status: 'pending',  // New orders are always pending
     };
 
-    // Save the order to the database
     db.query("INSERT INTO orders SET ?", orderData, (err, result) => {
         if (err) {
             console.error("Database insertion error:", err);
@@ -177,14 +175,14 @@ app.post("/api/orders", verifyToken, (req, res) => {
 });
 
 
-// Get orders (hall workers see all, machine operators see only their own)
+// GET ORDERS
 app.get('/api/orders', verifyToken, (req, res) => {
-    console.log("User from token:", req.user);  // Add this
+    console.log("User from token:", req.user);
     const role = req.user.role;
     const username = req.user.username;
 
     if (role === 'hall_worker' || role === 'shift_leader') {
-        // Hall workers and shift leaders see ALL orders
+
         db.query("SELECT * FROM orders", (err, results) => {
             if (err) {
                 console.error("Database error:", err);
@@ -193,7 +191,6 @@ app.get('/api/orders', verifyToken, (req, res) => {
             res.json({ success: true, orders: results });
         });
     } else if (role === 'machine_operator') {
-        // Machine operators see only their own orders
         db.query("SELECT * FROM orders WHERE machine_operator = ?", [username], (err, results) => {
             if (err) {
                 console.error("Database error:", err);
@@ -209,18 +206,13 @@ app.get('/api/orders', verifyToken, (req, res) => {
 
 
 
-
-
-
-// Mark order as received
+// MARK ORDER RECEIVED
 app.put("/api/orders/in-progress/:id", verifyToken, (req, res) => {
     if (req.user.role !== "hall_worker") {
         return res.status(403).json({ success: false, message: "Unauthorized. Only hall workers can mark orders as in progress." });
     }
 
     const orderId = req.params.id;
-
-    // Mark as in progress
     db.query(
         "UPDATE orders SET status = 'in_progress' WHERE id = ? AND status = 'pending'",
         [orderId],
@@ -240,7 +232,7 @@ app.put("/api/orders/in-progress/:id", verifyToken, (req, res) => {
 });
 
 
-// Move to in progress
+// MOVE TO IN PROGRESS
 app.put("/api/orders/:id", verifyToken, (req, res) => {
     const orderId = req.params.id;
     const newStatus = req.body.status;
@@ -250,12 +242,9 @@ app.put("/api/orders/:id", verifyToken, (req, res) => {
         return res.status(400).json({ success: false, message: "Invalid status" });
     }
 
-    // Only hall workers can change status to 'in_progress' or 'completed'
     if ((newStatus === "in_progress" || newStatus === "completed") && role !== "hall_worker") {
         return res.status(403).json({ success: false, message: "Unauthorized to update status" });
     }
-
-    // If changing status back to pending (like 'Loobu' feature), hall workers can do it, or you can add logic here
 
     db.query(
         "UPDATE orders SET status = ? WHERE id = ?",
@@ -274,7 +263,6 @@ app.put("/api/orders/:id", verifyToken, (req, res) => {
         }
     );
 });
-
 
 
 app.use(express.static(path.join(__dirname, '../frontend/dist')));

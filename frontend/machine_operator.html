@@ -31,10 +31,10 @@
             </div>
         </div>
 
-        <!-- Order Form Container -->
+        <!-- ORDER FORM -->
         <div id="order-form-container" class="mt-4">
             <form id="order-form" class="space-y-5">
-                <!-- Aadress -->
+                <!-- ADDRESS -->
                 <div>
                     <label class="block font-semibold mb-2">Aadress:</label>
                     <div class="flex flex-wrap gap-3">
@@ -44,7 +44,7 @@
                     </div>
                 </div>
 
-                <!-- Töökäsk -->
+                <!-- TÖÖKÄSK -->
                 <div>
                     <label class="block font-semibold mb-2">Töökäsk:</label>
                         <div class="flex flex-wrap gap-3">
@@ -57,7 +57,7 @@
                     <input type="hidden" id="order-type" name="order_type" />
                 </div>
 
-                <!-- Uus kast -->
+                <!-- UUS KAST -->
                 <div id="replacement-crate-section" class="hidden">
                     <label class="block font-semibold mb-2">Kas on vaja uut kasti?</label>
                     <label class="inline-flex items-center">
@@ -66,18 +66,18 @@
                     </label>
                 </div>
 
-                <!-- Märkused -->
+                <!-- MÄRKUSED -->
                 <div>
                     <label for="additional-notes" class="block font-semibold mb-2">Märkused (valikuline):</label>
                     <textarea id="additional-notes" class="border dark:border-gray-700 bg-white dark:bg-gray-700 p-2 w-full rounded" rows="3" placeholder="Kirjuta siia..."></textarea>
                 </div>
 
-                <!-- Submit -->
+                <!-- BUTTON -->
                 <button type="submit" class="bg-sigma text-white px-4 py-2 rounded w-full hover:bg-blue-600">Saada tellimus</button>
             </form>
         </div>
 
-        <!-- Orders Container (outside of the form container) -->
+        <!-- ORDERS CONTAINER -->
         <div id="orders-container" class="mt-4"></div>
     </div>
 

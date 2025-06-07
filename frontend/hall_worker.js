@@ -33,7 +33,7 @@ function showTab(tab) {
 }
 
 
-// Fetch
+// FETCH ORDERS
 async function fetchOrders() {
     try {
         const response = await fetch(`${import.meta.env.VITE_API_URL}/api/orders`, {
@@ -78,7 +78,7 @@ async function fetchOrders() {
     }
 }
 
-// Display orders
+// DISPALY ORDERS
 function displayOrders(orders, sectionTitle) {
     const ordersContainer = document.getElementById("orders-container");
     const section = document.createElement("div");
@@ -92,7 +92,7 @@ function displayOrders(orders, sectionTitle) {
     ordersContainer.appendChild(section);
 }
 
-// Card
+// CARD
 function createOrderCard(order) {
     const row = document.createElement("tr");
     row.className = "bg-gray-100 dark:bg-gray-700 transition";
@@ -113,7 +113,7 @@ function createOrderCard(order) {
         <td class="p-4" id="action-${order.id}"></td>
     `;
 
-    // Create buttons based on the active tab
+    // BUTTONS
     const actionCell = row.querySelector(`#action-${order.id}`);
     if (activeTab === 'pending') {
         const takeButton = document.createElement("button");
@@ -140,7 +140,7 @@ function createOrderCard(order) {
 }
 
 
-// GENERIC function to update order status
+// UPDATE ORDER STATUS
 async function updateOrderStatus(orderId, newStatus) {
     try {
         const response = await fetch(`${import.meta.env.VITE_API_URL}/api/orders/${orderId}`, {
@@ -156,7 +156,7 @@ async function updateOrderStatus(orderId, newStatus) {
 
         if (data.success) {
             alert(`Tellimuse staatus muudetud: ${newStatus}!`);
-            fetchOrders(); // Refresh the list
+            fetchOrders();
         }
 
     } catch (error) {
@@ -166,7 +166,7 @@ async function updateOrderStatus(orderId, newStatus) {
 }
 
 
-// Use the generic update function for all status changes
+// STATUS UPDATES
 function markOrderPending(orderId) {
     updateOrderStatus(orderId, 'pending');
 }
