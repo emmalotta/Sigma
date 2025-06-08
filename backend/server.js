@@ -13,7 +13,6 @@ const morgan = require("morgan");
 const path = require('path');
 
 
-
 const app = express();
 app.use(helmet());
 app.use(morgan("combined"));
@@ -46,7 +45,19 @@ app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 //     }
 // });
 
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/index.html'));
+});
 
+// MIDDLEWARE
+const authenticateToken = require('./authMiddleware');
+
+app.get('/api/protected-data', authenticateToken, (req, res) => {
+  res.json({ message: 'This is protected data', user: req.user });
+});
+
+
+// Middleware to verify JWT token
 const verifyToken = (req, res, next) => {
     const authHeader = req.headers['authorization'] || req.headers['Authorization'];
     if (!authHeader) {
@@ -62,6 +73,35 @@ const verifyToken = (req, res, next) => {
         return res.status(401).json({ success: false, message: "Invalid token." });
     }
 };
+
+// Protected HTML routes
+app.get('/hall_worker.html', verifyToken, (req, res) => {
+  if (req.user.role !== 'hall_worker') return res.redirect('/index.html');
+  res.sendFile(path.join(__dirname, '../frontend/hall_worker.html'));
+});
+app.get('/shift_leader.html', verifyToken, (req, res) => {
+  if (req.user.role !== 'shift_leader') return res.redirect('/index.html');
+  res.sendFile(path.join(__dirname, '../frontend/shift_leader.html'));
+});
+app.get('/machine_operator.html', verifyToken, (req, res) => {
+  if (req.user.role !== 'machine_operator') return res.redirect('/index.html');
+  res.sendFile(path.join(__dirname, '../frontend/machine_operator.html'));
+});
+app.get('/admin.html', verifyToken, (req, res) => {
+  if (req.user.role !== 'admin') return res.redirect('/index.html');
+  res.sendFile(path.join(__dirname, '../frontend/admin.html'));
+});
+
+
+const fs = require('fs');
+const distPath = path.join(__dirname, '../frontend/dist');
+
+if (fs.existsSync(distPath)) {
+  app.use(express.static(distPath));
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(distPath, 'index.html'));
+  });
+}
 
 
 
@@ -265,8 +305,8 @@ app.put("/api/orders/:id", verifyToken, (req, res) => {
 });
 
 
-app.use(express.static(path.join(__dirname, '../frontend/dist')));
+//app.use(express.static(path.join(__dirname, '../frontend/dist')));
 
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
-});
+//app.get('*', (req, res) => {
+//  res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+//});

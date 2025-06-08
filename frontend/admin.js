@@ -1,13 +1,29 @@
+const token = localStorage.getItem('token');
+const role = localStorage.getItem('role');
+if (!token || role !== 'admin') {
+    window.location.href = '/index.html';
+} else {
+    document.body.classList.remove('hidden');
+}
+
 document.addEventListener("DOMContentLoaded", function () {
     const form = document.getElementById("create-employee-form");
     const roleSelect = document.getElementById("role");
     const errorMessageElement = document.getElementById("error-message");
     const successMessageElement = document.getElementById("success-message");
 
+    const token = localStorage.getItem('token');
+
+    document.getElementById('logout-btn').addEventListener('click', () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');
+    window.location.href = '/index.html';
+    });
+
     if (!form || !roleSelect) {
         console.error("Form or role dropdown not found!");
         return;
-    }
+    }   
 
     form.addEventListener("submit", async function (event) {
         event.preventDefault();

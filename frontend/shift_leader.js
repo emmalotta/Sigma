@@ -1,8 +1,27 @@
-const token = localStorage.getItem('authToken');
-
-if (!token) {
-    window.location.href = "login.html";
+const token = localStorage.getItem('token');
+const role = localStorage.getItem('role');
+if (!token || role !== 'shift_leader') {
+  window.location.href = '/index.html';
+} else {
+    document.body.classList.remove('hidden');
 }
+
+fetch('/api/protected-data', {
+  method: 'GET',
+  headers: {
+    'Authorization': `Bearer ${token}`,
+    'Content-Type': 'application/json'
+  }
+})
+.then(response => response.json())
+.then(data => {
+});
+
+document.getElementById('logout-btn').addEventListener('click', () => {
+  localStorage.removeItem('token');
+  localStorage.removeItem('role');
+  window.location.href = '/index.html';
+});
 
 document.addEventListener("DOMContentLoaded", () => {
     const pendingTab = document.getElementById("pending-tab");

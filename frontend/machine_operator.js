@@ -1,10 +1,15 @@
-// Get the auth token
-const token = localStorage.getItem('authToken');
-
-
-if (!token) {
-    window.location.href = "login.html";
+const token = localStorage.getItem('token');
+const role = localStorage.getItem('role');
+if (!token || role !== 'machine_operator') {
+    window.location.href = '/index.html';
+} else {
+    document.body.classList.remove('hidden');
 }
+document.getElementById('logout-btn').addEventListener('click', () => {
+  localStorage.removeItem('token');
+  localStorage.removeItem('role');
+  window.location.href = '/index.html';
+});
 
 let activeTab = 'pending';
 let cachedOrders = [];
@@ -174,13 +179,8 @@ function createOrderCard(order) {
         cancelButton.className = "mr-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition";
         cancelButton.onclick = () => markOrderPending(order.id);
 
-        const completeButton = document.createElement("button");
-        completeButton.textContent = "Täidetud";
-        completeButton.className = "px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition";
-        completeButton.onclick = () => markOrderCompleted(order.id);
-
         actionCell.appendChild(cancelButton);
-        actionCell.appendChild(completeButton);
+
     }
 
     return row;
@@ -286,7 +286,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const sendReplacementCrate = replacementCrateCheckbox.checked ? "yes" : "no";
     const notes = additionalNotes.value.trim();
-    const token = localStorage.getItem("authToken");
+    const token = localStorage.getItem("token");
     const orderData = {
         order_type: selectedOrderType,
         additional_notes: notes,

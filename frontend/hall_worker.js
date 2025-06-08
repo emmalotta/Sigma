@@ -1,8 +1,20 @@
-const token = localStorage.getItem('authToken');
+const token = localStorage.getItem('token');
+const role = localStorage.getItem('role');
+if (!token || role !== 'hall_worker') {
+  window.location.href = '/index.html';
+} else {
+    document.body.classList.remove('hidden');
+}
 
 if (!token) {
     window.location.href = "login.html";
 }
+
+document.getElementById('logout-btn').addEventListener('click', () => {
+  localStorage.removeItem('token');
+  localStorage.removeItem('role');
+  window.location.href = '/index.html';
+});
 
 document.addEventListener("DOMContentLoaded", () => {
     const pendingTab = document.getElementById("pending-tab");

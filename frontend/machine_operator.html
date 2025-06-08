@@ -8,80 +8,78 @@
     <link href="./output.css" rel="stylesheet" />
 </head>
 
-<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 flex justify-center items-center min-h-screen p-4">
-    <div class="w-full max-w-2xl bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md">
-        <div class="flex flex-wrap mb-6">
-            <div class="flex flex-wrap justify-between gap-4 w-full">
-                <button id="order-tab"
-                    class="px-5 py-3 bg-sigma text-white font-semibold rounded-lg hover:bg-blue-700 transition w-full sm:w-auto">
-                    Uus tellimus:
-                </button>
-                <button id="pending-tab"
-                    class="px-5 py-3 bg-gray-600 text-white font-semibold rounded-lg hover:bg-gray-700 transition w-full sm:w-auto">
-                    Ootel tellimused
-                </button>
-                <button id="in-progress-tab"
-                    class="px-5 py-3 bg-gray-600 text-white font-semibold rounded-lg hover:bg-gray-700 transition w-full sm:w-auto">
-                    Töös tellimused
-                </button>
-                <button id="history-tab"
-                    class="px-5 py-3 bg-gray-600 text-white font-semibold rounded-lg hover:bg-gray-700 transition w-full sm:w-auto">
-                    Ajalugu
-                </button>
+<body class="hidden bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen">
+
+    <!-- LOGOUT BUTTON -->
+    <button id="logout-btn"
+        class="fixed top-6 right-6 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 shadow z-50">
+        Logi välja
+    </button>
+
+    <!-- Main content centered -->
+    <main class="flex justify-center items-center min-h-screen p-4">
+        <div class="w-full max-w-2xl bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md">
+            <div class="flex flex-wrap mb-6">
+                <div class="flex flex-wrap justify-between gap-4 w-full">
+                    <button id="order-tab"
+                        class="px-5 py-3 bg-sigma text-white font-semibold rounded-lg hover:bg-blue-700 transition w-full sm:w-auto">
+                        Uus tellimus:
+                    </button>
+                    <button id="pending-tab"
+                        class="px-5 py-3 bg-gray-600 text-white font-semibold rounded-lg hover:bg-gray-700 transition w-full sm:w-auto">
+                        Ootel tellimused
+                    </button>
+                    <button id="in-progress-tab"
+                        class="px-5 py-3 bg-gray-600 text-white font-semibold rounded-lg hover:bg-gray-700 transition w-full sm:w-auto">
+                        Töös tellimused
+                    </button>
+                    <button id="history-tab"
+                        class="px-5 py-3 bg-gray-600 text-white font-semibold rounded-lg hover:bg-gray-700 transition w-full sm:w-auto">
+                        Ajalugu
+                    </button>
+                </div>
             </div>
-        </div>
 
-        <!-- ORDER FORM -->
-        <div id="order-form-container" class="mt-4">
-            <form id="order-form" class="space-y-5">
-                <!-- ADDRESS -->
-                <div>
-                    <label class="block font-semibold mb-2">Aadress:</label>
-                    <div class="flex flex-wrap gap-3">
-                        <button type="button" class="order-btn bg-sigma text-white px-4 py-2 rounded-3xl hover:bg-blue-600 w-full sm:w-auto mb-2 sm:mb-0">90</button>
-                        <button type="button" class="order-btn bg-sigma text-white px-4 py-2 rounded-3xl hover:bg-blue-600 w-full sm:w-auto mb-2 sm:mb-0">99</button>
-                        <button type="button" class="order-btn bg-sigma text-white px-4 py-2 rounded-3xl hover:bg-blue-600 w-full sm:w-auto mb-2 sm:mb-0">Muu</button>
+            <!-- ORDER FORM -->
+            <div id="order-form-container" class="mt-4">
+                <form id="order-form" class="space-y-5">
+                    <div class="flex gap-2">
+                        <button type="button" class="order-btn bg-sigma text-white px-4 py-2 rounded" data-type="rubber">
+                            Kumm
+                        </button>
+                        <button type="button" class="order-btn bg-sigma text-white px-4 py-2 rounded" data-type="component">
+                            Komponent
+                        </button>
+                        <button type="button" class="order-btn bg-sigma text-white px-4 py-2 rounded" data-type="packaging">
+                            Pakkematerjal
+                        </button>
+                        <button type="button" class="order-btn bg-sigma text-white px-4 py-2 rounded" data-type="crate_removal">
+                            Toodangu äraviimine
+                        </button>
                     </div>
-                </div>
+                    <input type="hidden" id="order-type" name="order-type" />
 
-                <!-- TÖÖKÄSK -->
-                <div>
-                    <label class="block font-semibold mb-2">Töökäsk:</label>
-                        <div class="flex flex-wrap gap-3">
-                            <button type="button" data-type="rubber" class="order-btn  bg-sigma text-white px-4 py-2 rounded hover:bg-blue-600 w-full sm:w-auto mb-2 sm:mb-0" data-type="kumm">Kumm</button>
-                            <button type="button" data-type="packaging" class="order-btn bg-sigma text-white px-4 py-2 rounded hover:bg-blue-600 w-full sm:w-auto mb-2 sm:mb-0" data-type="pakkematerjal">Pakkematerjal</button>
-                            <button type="button" data-type="component" class="order-btn bg-sigma text-white px-4 py-2 rounded hover:bg-blue-600 w-full sm:w-auto mb-2 sm:mb-0" data-type="komponent">Komponent</button>
-                            <button type="button" data-type="crate_removal" class="order-btn bg-sigma text-white px-4 py-2 rounded hover:bg-blue-600 w-full sm:w-auto mb-2 sm:mb-0" data-type="toodangu_äraviimine">Toodangu äraviimine</button>
-                        </div>
+                    <div id="replacement-crate-section" class="hidden">
+                        <label class="inline-flex items-center">
+                            <input type="checkbox" id="replacement-crate" class="form-checkbox" />
+                            <span class="ml-2">Soovin asenduskasti</span>
+                        </label>
+                    </div>
 
-                    <input type="hidden" id="order-type" name="order_type" />
-                </div>
-
-                <!-- UUS KAST -->
-                <div id="replacement-crate-section" class="hidden">
-                    <label class="block font-semibold mb-2">Kas on vaja uut kasti?</label>
-                    <label class="inline-flex items-center">
-                        <input type="checkbox" id="replacement-crate" class="mr-2" />
-                        <span>Too uus kast</span>
+                    <label class="block">
+                        <span class="text-gray-700 dark:text-gray-200">Märkused</span>
+                        <textarea id="additional-notes" class="mt-1 block w-full rounded border-gray-300 dark:bg-gray-700 dark:text-gray-100"></textarea>
                     </label>
-                </div>
 
-                <!-- MÄRKUSED -->
-                <div>
-                    <label for="additional-notes" class="block font-semibold mb-2">Märkused (valikuline):</label>
-                    <textarea id="additional-notes" class="border dark:border-gray-700 bg-white dark:bg-gray-700 p-2 w-full rounded" rows="3" placeholder="Kirjuta siia..."></textarea>
-                </div>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Saada tellimus</button>
+                </form>
+            </div>
 
-                <!-- BUTTON -->
-                <button type="submit" class="bg-sigma text-white px-4 py-2 rounded w-full hover:bg-blue-600">Saada tellimus</button>
-            </form>
+            <!-- ORDERS CONTAINER -->
+            <div id="orders-container" class="mt-4"></div>
         </div>
-
-        <!-- ORDERS CONTAINER -->
-        <div id="orders-container" class="mt-4"></div>
-    </div>
+    </main>
 
     <script type="module" src="machine_operator.js"></script>
 </body>
-
 </html>

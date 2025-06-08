@@ -39,23 +39,20 @@ form.addEventListener("submit", async function (event) {
         const errorMessageElement = document.getElementById("error-message");
 
         if (data.success) {
-            localStorage.setItem("authToken", data.token);
-            localStorage.setItem("userRole", data.role);
+            localStorage.setItem("token", data.token);
+            localStorage.setItem("role", data.role);
 
-        if (data.role === 'admin') {
-        window.location.href = '/admin.html';
-        } else if (data.role === 'machine_operator') {
-        window.location.href = '/machine_operator.html';
-        } else if (data.role === 'hall_worker') {
-        window.location.href = '/hall_worker.html';
-        } else if (data.role === 'shift_leader') {
-        window.location.href = '/shift_leader.html';
-        } else {
-        window.location.href = '/hall_worker.html';
-        }
-
-        } else {
-            errorMessageElement.textContent = data.message;
+            if (data.role === 'admin') {
+                window.location.href = '/admin.html';
+            } else if (data.role === 'machine_operator') {
+                window.location.href = '/machine_operator.html';
+            } else if (data.role === 'hall_worker') {
+                window.location.href = '/hall_worker.html';
+            } else if (data.role === 'shift_leader') {
+                window.location.href = '/shift_leader.html';
+            } else {
+                window.location.href = '/hall_worker.html';
+            }
         }
 
 
