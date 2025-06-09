@@ -368,6 +368,9 @@ document.addEventListener("DOMContentLoaded", () => {
         } else {
             showError("Tellimuse saatmine ebaõnnestus: " + (result.message || "Viga serveris"));
         }
+
+        cachedOrders = [];  // clear cache
+        await fetchOrders(); // fetch new orders and update UI
     } catch (error) {
         console.error("Tellimuse saatmisel viga:", error);
         showError("Tellimuse saatmisel tekkis viga.");

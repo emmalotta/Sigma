@@ -38,7 +38,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         try {
-            const token = localStorage.getItem("authToken");
+            const token = localStorage.getItem("token");
             if (!token) {
                 errorMessageElement.textContent = "Peate olema sisseloginud administraatorina.";
                 return;
@@ -57,14 +57,28 @@ document.addEventListener("DOMContentLoaded", function () {
 
             if (data.success) {
                 successMessageElement.textContent = "Töötaja loodud edukalt!";
+                successMessageElement.classList.remove("hidden");
                 errorMessageElement.textContent = "";
+                errorMessageElement.classList.add("hidden");
+
+                setTimeout(() => {
+                    successMessageElement.classList.add("hidden");
+                }, 5000);
             } else {
-                errorMessageElement.textContent = "❌" + data.message;
+                errorMessageElement.textContent = "❌ " + data.message;
+                errorMessageElement.classList.remove("hidden");
                 successMessageElement.textContent = "";
+                successMessageElement.classList.add("hidden");
             }
+            form.reset();
+
+
         } catch (error) {
-            console.error("Error creating employee:", error);
             errorMessageElement.textContent = "Tekkis viga. Palun proovige uuesti.";
+            errorMessageElement.classList.remove("hidden");
+            successMessageElement.textContent = "";
+            successMessageElement.classList.add("hidden");
+
         }
     });
 });
