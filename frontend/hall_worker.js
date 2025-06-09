@@ -257,7 +257,7 @@ async function updateOrderStatus(orderId, newStatus) {
         const data = await response.json();
 
         if (data.success) {
-            alert(`Tellimuse staatus muudetud: ${newStatus}!`);
+            showSuccess(`Tellimuse staatus muudetud: ${newStatus === "pending" ? "Ootel" : newStatus === "in_progress" ? "Töös" : "Täidetud"}!`);
             fetchOrders();
         }
 
@@ -289,6 +289,16 @@ function showError(message) {
             <td colspan="5" class="p-4 text-red-500 text-center">${message}</td>
         </tr>
     `;
+}
+
+function showSuccess(message) {
+    const msg = document.getElementById("success-message");
+    if (!msg) return;
+    msg.textContent = message;
+    msg.classList.remove("hidden");
+    setTimeout(() => {
+        msg.classList.add("hidden");
+    }, 2500);
 }
 
 // Make status update functions available globally for inline onclick

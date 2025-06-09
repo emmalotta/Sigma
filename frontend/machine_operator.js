@@ -168,6 +168,10 @@ function renderOrders() {
     ordersContainer.appendChild(table);
 }
 
+window.addEventListener("resize", () => {
+    renderOrders();
+});
+
 // CREATE ORDER CARD
 function createOrderCard(order) {
     const row = document.createElement("tr");
@@ -256,13 +260,24 @@ function markOrderInProgress(orderId) {
     updateOrderStatus(orderId, 'in_progress');
 }
 
+function showSuccess(message) {
+    const msg = document.getElementById("success-message");
+    if (!msg) return;
+    msg.textContent = message;
+    msg.classList.remove("hidden");
+    setTimeout(() => {
+        msg.classList.add("hidden");
+    }, 2500);
+}
+
 function showError(message) {
-    const ordersContainer = document.getElementById("orders-container");
-    ordersContainer.innerHTML = `
-        <tr>
-            <td colspan="5" class="p-4 text-red-500 text-center">${message}</td>
-        </tr>
-    `;
+    const msg = document.getElementById("error-message");
+    if (!msg) return;
+    msg.textContent = message;
+    msg.classList.remove("hidden");
+    setTimeout(() => {
+        msg.classList.add("hidden");
+    }, 3500);
 }
 
 // EVENT LISTENERS
@@ -305,7 +320,7 @@ document.addEventListener("DOMContentLoaded", () => {
     e.preventDefault();
 
     if (!selectedOrderType) {
-        alert("Palun vali töökäsk.");
+        showError("Palun vali töökäsk.");
         return;
     }
 
@@ -334,7 +349,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const result = await response.json();
         if (response.ok && result.success) {
-        alert("Tellimus saadetud!");
+        showSuccess("Tellimus saadetud!");
         orderForm.reset();
         orderTypeInput.value = "";
         selectedOrderType = "";
@@ -343,11 +358,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
         orderTypeButtons.forEach(btn => btn.classList.remove("bg-blue-700", "text-white"));
         } else {
-        alert("Tellimuse saatmine ebaõnnestus: " + (result.message || "Viga serveris"));
+            showError("Tellimuse saatmine ebaõnnestus: " + (result.message || "Viga serveris"));
         }
     } catch (error) {
         console.error("Tellimuse saatmisel viga:", error);
-        alert("Tellimuse saatmisel tekkis viga.");
+        showError("Tellimuse saatmisel tekkis viga.");
     }
     });
 });
@@ -408,3 +423,4 @@ function renderOrderCards(orders) {
         cardsContainer.appendChild(card);
     });
 }
+

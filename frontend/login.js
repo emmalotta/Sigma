@@ -53,6 +53,8 @@ form.addEventListener("submit", async function (event) {
             } else {
                 window.location.href = '/hall_worker.html';
             }
+        } else {
+            errorMessageElement.textContent = data.message || "Vale kasutajanimi või parool.";
         }
 
 
