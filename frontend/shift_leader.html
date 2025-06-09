@@ -21,23 +21,43 @@
 
     <div class="w-full max-w-4xl bg-white dark:bg-gray-800 p-8 rounded-xl shadow-xl mt-10">
 
-    <button id="logout-btn" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 absolute top-4 right-4">
-    Logi välja
+    <button id="logout-btn" class="sticky top-4 left-4 p-2 bg-red-600 text-white rounded hover:bg-red-700 shadow z-50" title="Logi välja" aria-label="Logi välja">
+      <svg width="24" height="24" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6A2.25 2.25 0 0 0 5.25 5.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15"/>
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9l-3 3m0 0l3 3m-3-3h12.75"/>
+      </svg>
     </button>
         <h1 class="text-4xl font-bold mb-8 text-center text-gray-800 dark:text-gray-100">Tellimused</h1>
 
         <!-- TAB NAVIGATION -->
-        <div class="flex justify-center space-x-4 mb-8">
-            <button id="pending-tab" class="px-5 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition">
+        <div class="flex flex-wrap gap-2 justify-center mb-8">
+            <div class="flex flex-wrap gap-2 w-full sm:w-auto">
+                <button id="pending-tab"
+                class="w-full sm:w-auto px-4 py-2 rounded-full font-semibold transition
+                        bg-sigma text-blue-700
+                        dark:bg-gray-700 dark:text-gray-100
+                        hover:bg-gray-200 dark:hover:bg-gray-600
+                        focus:outline-none focus:ring-2 focus:ring-blue-400 text-center">
                 Ootel tellimused
-            </button>
-            <button id="in-progress-tab" class="px-5 py-3 bg-gray-600 text-white font-semibold rounded-lg hover:bg-gray-700 transition">
+                </button>
+                <button id="in-progress-tab"
+                class="w-full sm:w-auto px-4 py-2 rounded-full font-semibold transition
+                        bg-sigma text-blue-700
+                        dark:bg-gray-700 dark:text-gray-100
+                        hover:bg-gray-200 dark:hover:bg-gray-600
+                        focus:outline-none focus:ring-2 focus:ring-blue-400 text-center">
                 Töös olevad tellimused
-            </button>
-            <button id="history-tab" class="px-5 py-3 bg-gray-600 text-white font-semibold rounded-lg hover:bg-gray-700 transition">
+                </button>
+                <button id="history-tab"
+                class="w-full sm:w-auto px-4 py-2 rounded-full font-semibold transition
+                        bg-sigma text-blue-700
+                        dark:bg-gray-700 dark:text-gray-100
+                        hover:bg-gray-200 dark:hover:bg-gray-600
+                        focus:outline-none focus:ring-2 focus:ring-blue-400 text-center">
                 Ajalugu
-            </button>
-        </div>
+                </button>
+            </div>
+            </div>
 
         <div class="overflow-x-auto">
             <table class="min-w-full bg-gray-100 dark:bg-gray-700 rounded-lg shadow">
@@ -54,6 +74,7 @@
                 </tbody>
             </table>
         </div>
+        <div class="block sm:hidden" id="orders-cards"></div>
     </div>
 
     <script type="module" src="shift_leader.js"></script>

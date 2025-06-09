@@ -63,7 +63,9 @@ async function fetchOrders() {
 
         if (data.success) {
             const ordersContainer = document.getElementById("orders-container");
+            const cardsContainer = document.getElementById("orders-cards");
             ordersContainer.innerHTML = '';
+            if (cardsContainer) cardsContainer.innerHTML = '';
 
             const pendingOrders = data.orders.filter(order => order.status === 'pending');
             const inProgressOrders = data.orders.filter(order => order.status === 'in_progress');
@@ -79,18 +81,26 @@ async function fetchOrders() {
             }
 
             if (ordersToShow.length === 0) {
-                ordersContainer.innerHTML = `
-                    <tr>
-                        <td colspan="5" class="p-4 text-center text-gray-600 dark:text-gray-300">
-                            No orders to display.
-                        </td>
-                    </tr>
-                `;
+                if (window.innerWidth < 640 && cardsContainer) {
+                    cardsContainer.innerHTML = `<p class="text-center py-6 text-gray-500 dark:text-gray-400">Tellimusi ei leitud.</p>`;
+                } else {
+                    ordersContainer.innerHTML = `
+                        <tr>
+                            <td colspan="5" class="p-4 text-center text-gray-600 dark:text-gray-300">
+                                No orders to display.
+                            </td>
+                        </tr>
+                    `;
+                }
             } else {
-                ordersToShow.forEach(order => {
-                    const orderRow = createOrderRow(order);
-                    ordersContainer.appendChild(orderRow);
-                });
+                if (window.innerWidth < 640 && cardsContainer) {
+                    renderOrderCards(ordersToShow);
+                } else {
+                    ordersToShow.forEach(order => {
+                        const orderRow = createOrderRow(order);
+                        ordersContainer.appendChild(orderRow);
+                    });
+                }
             }
 
         } else {
@@ -113,16 +123,6 @@ function createOrderRow(order) {
     let statusLabel = "";
     switch (order.status) {
         case "pending":
-            statusLabel = "Ootel";
-            break;
-        case "in_progress":
-            statusLabel = "Töös";
-            break;
-        case "completed":
-            statusLabel = "Täidetud";
-            break;
-        default:
-            statusLabel = order.status;
     }
 
     row.innerHTML = `
@@ -147,4 +147,48 @@ function showError(message) {
             <td colspan="5" class="p-4 text-red-500 text-center">${message}</td>
         </tr>
     `;
+}
+
+function renderOrderCards(orders) {
+    const cardsContainer = document.getElementById("orders-cards");
+    cardsContainer.innerHTML = "";
+    orders.forEach(order => {
+        const card = document.createElement("div");
+        card.className = "mb-4 rounded-xl shadow bg-gray-100 dark:bg-gray-700 p-4";
+        card.innerHTML = `
+            <div class="flex justify-between mb-2">
+                <span class="font-semibold">Operaator:</span>
+                <span>${order.machine_operator}</span>
+            </div>
+            <div class="flex justify-between mb-2">
+                <span class="font-semibold">Tüüp:</span>
+                <span>${order.order_type === "material_order" ? "Materjalitellimus" : order.order_type === "crate_removal" ? "Kastide eemaldus" : order.order_type}</span>
+            </div>
+            <div class="flex justify-between mb-2">
+                <span class="font-semibold">Uus kast:</span>
+                <span>${order.order_type === "crate_removal" ? (order.replacement_crate || "Puudub") : "-"}</span>
+            </div>
+            <div class="flex justify-between mb-2">
+                <span class="font-semibold">Märkused:</span>
+                <span>${order.additional_notes || "-"}</span>
+            </div>
+            <div class="flex justify-between mb-2">
+                <span class="font-semibold">Staatus:</span>
+                <span>${
+                    order.status === "pending"
+                        ? "Ootel"
+                        : order.status === "in_progress"
+                        ? "Töös"
+                        : order.status === "completed"
+                        ? "Täidetud"
+                        : order.status
+                }</span>
+            </div>
+            <div class="flex justify-between mb-2">
+                <span class="font-semibold">Aeg:</span>
+                <span>${order.created_at ? new Date(order.created_at).toLocaleString('et-EE', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }) : "-"}</span>
+            </div>
+        `;
+        cardsContainer.appendChild(card);
+    });
 }

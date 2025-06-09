@@ -18,24 +18,25 @@ let cachedOrders = [];
 function showTab(tab) {
     activeTab = tab;
 
+    const tabs = [
+        { id: 'order-tab', active: tab === 'order' },
+        { id: 'pending-tab', active: tab === 'pending' },
+        { id: 'in-progress-tab', active: tab === 'in-progress' },
+        { id: 'history-tab', active: tab === 'history' }
+    ];
+    tabs.forEach(({ id, active }) => {
+        const btn = document.getElementById(id);
+        btn.classList.toggle('bg-blue-600', active);
+        btn.classList.toggle('text-white', active);
+        btn.classList.toggle('shadow', active);
+        btn.classList.toggle('bg-gray-200', !active);
+        btn.classList.toggle('dark:bg-gray-700', !active);
+        btn.classList.toggle('text-gray-800', !active);
+        btn.classList.toggle('dark:text-gray-100', !active);
+    });
 
     document.getElementById('order-form-container').style.display = (tab === 'order') ? 'block' : 'none';
     document.getElementById('orders-container').style.display = (tab === 'order') ? 'none' : 'block';
-
-    ['order-tab', 'pending-tab', 'in-progress-tab', 'history-tab'].forEach(id => {
-        const btn = document.getElementById(id);
-        if (!btn) return;
-
-        if (id === `${tab}-tab`) {
-            btn.classList.add('tab-active');
-            btn.classList.remove('bg-gray-600', 'hover:bg-gray-700');
-            btn.classList.add('bg-sigma', 'hover:bg-blue-700', 'text-white');
-        } else {
-            btn.classList.remove('tab-active');
-            btn.classList.remove('bg-sigma', 'hover:bg-blue-700', 'text-white');
-            btn.classList.add('bg-gray-600', 'hover:bg-gray-700', 'text-white');
-        }
-    });
 
     if (tab !== 'order') {
         fetchOrders();
@@ -78,36 +79,48 @@ async function fetchOrders() {
 // RENDER ORDERS
 function renderOrders() {
     const ordersContainer = document.getElementById("orders-container");
-    ordersContainer.innerHTML = ''; // clear previous content
+    const cardsContainer = document.getElementById("orders-cards");
+    ordersContainer.innerHTML = '';
+    if (cardsContainer) cardsContainer.innerHTML = '';
 
     const pendingOrders = cachedOrders.filter(order => order.status === 'pending');
     const inProgressOrders = cachedOrders.filter(order => order.status === 'in_progress');
     const completedOrders = cachedOrders.filter(order => order.status === 'completed');
 
-    const ordersToDisplay = (activeTab === 'pending') ? pendingOrders :
-                            (activeTab === 'in-progress') ? inProgressOrders :
-                            (activeTab === 'history') ? completedOrders : [];
+    let ordersToDisplay = (activeTab === 'pending') ? pendingOrders :
+                          (activeTab === 'in-progress') ? inProgressOrders :
+                          (activeTab === 'history') ? completedOrders : [];
+
+    ordersToDisplay = ordersToDisplay.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
     if (ordersToDisplay.length === 0) {
-        ordersContainer.innerHTML = `
-            <p class="text-center py-6 text-gray-500 dark:text-gray-400">Tellimusi ei leitud.</p>
-        `;
+        if (window.innerWidth < 640 && cardsContainer) {
+            cardsContainer.innerHTML = `<p class="text-center py-6 text-gray-500 dark:text-gray-400">Tellimusi ei leitud.</p>`;
+        } else {
+            ordersContainer.innerHTML = `<p class="text-center py-6 text-gray-500 dark:text-gray-400">Tellimusi ei leitud.</p>`;
+        }
         return;
     }
 
-    // Create table element
+    // MOBILE
+    if (window.innerWidth < 640 && cardsContainer) {
+        renderOrderCards(ordersToDisplay);
+        return;
+    }
+
     const table = document.createElement('table');
-    table.className = 'w-full text-left rounded-lg overflow-hidden shadow-md';
+    table.className = 'min-w-full text-sm sm:text-base bg-gray-100 dark:bg-gray-700 rounded-xl overflow-hidden shadow';
 
     // TABLE HEAD
     table.innerHTML = `
-        <thead class="bg-sigma text-white">
-            <tr>
-                <th class="px-4 py-3">Operaator</th>
-                <th class="px-4 py-3">Tellimuse tüüp</th>
-                <th class="px-4 py-3">Uus kast</th>
-                <th class="px-4 py-3">Märkused</th>
-                <th class="px-4 py-3">Tegevused</th>
+        <thead>
+            <tr class="bg-gray-300 dark:bg-gray-600">
+                <th class="p-2 sm:p-4 font-semibold">Operaator</th>
+                <th class="p-2 sm:p-4 font-semibold">Tellimuse tüüp</th>
+                <th class="p-2 sm:p-4 font-semibold">Uus kast</th>
+                <th class="p-2 sm:p-4 font-semibold">Märkused</th>
+                <th class="p-2 sm:p-4 font-semibold">Aeg</th>
+                <th class="p-2 sm:p-4"></th>
             </tr>
         </thead>
     `;
@@ -115,32 +128,45 @@ function renderOrders() {
     // TABLE BODY
     const tbody = document.createElement('tbody');
 
-    // ROWS
     ordersToDisplay.forEach((order, index) => {
         const tr = document.createElement('tr');
-
-        tr.className = index % 2 === 0 ? 'bg-gray-100 dark:bg-gray-700' : 'bg-white dark:bg-gray-800';
+        tr.className = `${index % 2 === 0 ? "bg-gray-100 dark:bg-gray-700" : "bg-white dark:bg-gray-800"} hover:bg-blue-50 dark:hover:bg-blue-900 transition`;
 
         let orderType = order.order_type === "material_order" ? "Materjalitellimus" :
             order.order_type === "crate_removal" ? "Kastide eemaldus" :
                 order.order_type;
 
+        const createdAt = order.created_at
+            ? new Date(order.created_at).toLocaleString('et-EE', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
+            : "-";
+
+        // Cells
         tr.innerHTML = `
-            <td class="px-4 py-3">${order.machine_operator}</td>
-            <td class="px-4 py-3">${orderType}</td>
-            <td class="px-4 py-3">${order.order_type === "crate_removal" ? (order.replacement_crate || "Puudub") : '-'}</td>
-            <td class="px-4 py-3">${order.additional_notes ? order.additional_notes : '-'}</td>
-            <td class="px-4 py-3 flex gap-2"></td>
+            <td class="p-4">${order.machine_operator}</td>
+            <td class="p-4">${orderType}</td>
+            <td class="p-4">${order.order_type === "crate_removal" ? (order.replacement_crate || "Puudub") : '-'}</td>
+            <td class="p-4">${order.additional_notes ? order.additional_notes : '-'}</td>
+            <td class="p-4">${createdAt}</td>
+            <td class="p-4 flex gap-2"></td>
         `;
 
+        // BUTTON?
+        //const actionCell = tr.querySelector('td:last-child');
+        //if (activeTab === 'pending') {
+            //const cancelButton = document.createElement("button");
+            //cancelButton.textContent = "Loobu";
+            //cancelButton.className = "inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white font-medium rounded-full shadow hover:bg-red-700 transition duration-200";
+            //cancelButton.onclick = () => markOrderPending(order.id);
+            //actionCell.appendChild(cancelButton);
 
+        //}
         tbody.appendChild(tr);
+        
     });
 
     table.appendChild(tbody);
     ordersContainer.appendChild(table);
 }
-
 
 // CREATE ORDER CARD
 function createOrderCard(order) {
@@ -252,14 +278,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   orderTypeButtons.forEach(button => {
     button.addEventListener("click", () => {
-
       orderTypeButtons.forEach(btn => {
-        btn.classList.remove("bg-blue-700", "text-white");
-        btn.classList.add("bg-sigma");
+        btn.classList.remove("border-blue-500", "shadow-lg", "z-10");
+        btn.classList.add("border-transparent", "shadow-sm");
       });
 
-      button.classList.add("bg-blue-700", "text-white");
-      button.classList.remove("bg-sigma");
+      button.classList.remove("border-transparent", "shadow-sm");
+      button.classList.add("border-blue-500", "shadow-lg", "z-10");
 
       selectedOrderType = button.getAttribute("data-type");
       if (orderTypeInput) {
@@ -338,3 +363,35 @@ document.addEventListener("DOMContentLoaded", () => {
 
     showTab('order');
 });
+
+function renderOrderCards(orders) {
+    const cardsContainer = document.getElementById("orders-cards");
+    cardsContainer.innerHTML = "";
+    orders.forEach(order => {
+        const card = document.createElement("div");
+        card.className = "mb-4 rounded-xl shadow bg-gray-100 dark:bg-gray-700 p-4";
+        card.innerHTML = `
+            <div class="flex justify-between mb-2">
+                <span class="font-semibold">Operaator:</span>
+                <span>${order.machine_operator}</span>
+            </div>
+            <div class="flex justify-between mb-2">
+                <span class="font-semibold">Tüüp:</span>
+                <span>${order.order_type === "material_order" ? "Materjalitellimus" : order.order_type === "crate_removal" ? "Kastide eemaldus" : order.order_type}</span>
+            </div>
+            <div class="flex justify-between mb-2">
+                <span class="font-semibold">Uus kast:</span>
+                <span>${order.order_type === "crate_removal" ? (order.replacement_crate || "Puudub") : "-"}</span>
+            </div>
+            <div class="flex justify-between mb-2">
+                <span class="font-semibold">Märkused:</span>
+                <span>${order.additional_notes || "-"}</span>
+            </div>
+            <div class="flex justify-between mb-2">
+                <span class="font-semibold">Aeg:</span>
+                <span>${order.created_at ? new Date(order.created_at).toLocaleString('et-EE', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }) : "-"}</span>
+            </div>
+        `;
+        cardsContainer.appendChild(card);
+    });
+}
