@@ -200,7 +200,14 @@ function renderOrderCards(orders) {
                 </div>
                 <div class="flex justify-between">
                     <span class="font-semibold text-gray-600 dark:text-gray-300">Aeg:</span>
-                    <span>${order.created_at ? new Date(order.created_at).toLocaleString('et-EE', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }) : "-"}</span>
+                    <span>${order.created_at ? new Date(order.created_at).toLocaleString('et-EE', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    timeZone: 'Europe/Tallinn'
+                    }) : "-"}</span>
                 </div>
             </div>
         `;

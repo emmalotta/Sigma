@@ -30,7 +30,8 @@ const db = mysql.createPool({
     database: process.env.DB_NAME,
     waitForConnections: true,
     connectionLimit: 10,
-    queueLimit: 0
+    queueLimit: 0,
+    timezone: '+03:00' // Set timezone to Eastern European Time (EET)
 });
 
 const PORT = process.env.PORT || 8080;

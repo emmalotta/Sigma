@@ -136,9 +136,17 @@ function renderOrders() {
             order.order_type === "crate_removal" ? "Kastide eemaldus" :
                 order.order_type;
 
-        const createdAt = order.created_at
-            ? new Date(order.created_at).toLocaleString('et-EE', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
-            : "-";
+        const createdAtLocal = order.created_at.replace(' ', 'T'); 
+        const createdAt = new Date(createdAtLocal).toLocaleString('et-EE', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            timeZone: 'Europe/Tallinn'
+        });
+
+
 
         // Cells
         tr.innerHTML = `
