@@ -123,16 +123,10 @@ function createOrderCard(order, index) {
         order.order_type === "crate_removal" ? "Kastide eemaldus" :
             order.order_type;
 
-    const createdAt = order.created_at
-    ? new Date(order.created_at).toLocaleString('et-EE', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        timeZone: 'Europe/Tallinn'
-      })
-    : "-";
+    const date = new Date(results[0].some_datetime_column);
+    console.log(date.toLocaleString());  // Should match your local time
+
+
 
 
     // Create cells

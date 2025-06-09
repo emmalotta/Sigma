@@ -31,7 +31,7 @@ const db = mysql.createPool({
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
-    timezone: '+03:00' // Set timezone to Eastern European Time (EET)
+    timezone: 'Z',
 });
 
 const PORT = process.env.PORT || 8080;
