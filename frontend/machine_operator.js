@@ -279,12 +279,12 @@ document.addEventListener("DOMContentLoaded", () => {
   orderTypeButtons.forEach(button => {
     button.addEventListener("click", () => {
       orderTypeButtons.forEach(btn => {
-        btn.classList.remove("border-blue-500", "shadow-lg", "z-10");
-        btn.classList.add("border-transparent", "shadow-sm");
+        btn.classList.remove("bg-blue-200", "border-blue-400", "ring-2", "ring-blue-200", "z-10");
+        btn.classList.add("bg-sigma", "text-white", "border-transparent", "shadow-sm");
       });
 
-      button.classList.remove("border-transparent", "shadow-sm");
-      button.classList.add("border-blue-500", "shadow-lg", "z-10");
+      button.classList.remove("bg-sigma", "border-transparent", "shadow-sm");
+      button.classList.add("bg-blue-500", "text-blue-900", "border-blue-400", "ring-2", "ring-blue-200", "z-10", "shadow-lg");
 
       selectedOrderType = button.getAttribute("data-type");
       if (orderTypeInput) {
@@ -368,28 +368,41 @@ function renderOrderCards(orders) {
     const cardsContainer = document.getElementById("orders-cards");
     cardsContainer.innerHTML = "";
     orders.forEach(order => {
+        const statusMap = {
+            pending: { text: "Ootel", color: "bg-yellow-100 text-yellow-800" },
+            in_progress: { text: "Töös", color: "bg-blue-100 text-blue-800" },
+            completed: { text: "Täidetud", color: "bg-green-100 text-green-800" }
+        };
+        const status = statusMap[order.status] || { text: order.status, color: "bg-gray-200 text-gray-800" };
+
         const card = document.createElement("div");
-        card.className = "mb-4 rounded-xl shadow bg-gray-100 dark:bg-gray-700 p-4";
+        card.className = "mb-6 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-lg bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-800 dark:via-gray-900 dark:to-gray-800 p-5";
         card.innerHTML = `
-            <div class="flex justify-between mb-2">
-                <span class="font-semibold">Operaator:</span>
-                <span>${order.machine_operator}</span>
+            <div class="flex justify-between items-center mb-3">
+                <span class="text-lg font-bold text-gray-700 dark:text-gray-100">Tellimus #${order.id || ""}</span>
+                <span class="px-3 py-1 rounded-full text-xs font-semibold ${status.color}">${status.text}</span>
             </div>
-            <div class="flex justify-between mb-2">
-                <span class="font-semibold">Tüüp:</span>
-                <span>${order.order_type === "material_order" ? "Materjalitellimus" : order.order_type === "crate_removal" ? "Kastide eemaldus" : order.order_type}</span>
-            </div>
-            <div class="flex justify-between mb-2">
-                <span class="font-semibold">Uus kast:</span>
-                <span>${order.order_type === "crate_removal" ? (order.replacement_crate || "Puudub") : "-"}</span>
-            </div>
-            <div class="flex justify-between mb-2">
-                <span class="font-semibold">Märkused:</span>
-                <span>${order.additional_notes || "-"}</span>
-            </div>
-            <div class="flex justify-between mb-2">
-                <span class="font-semibold">Aeg:</span>
-                <span>${order.created_at ? new Date(order.created_at).toLocaleString('et-EE', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }) : "-"}</span>
+            <div class="space-y-2 mb-4">
+                <div class="flex justify-between">
+                    <span class="font-semibold text-gray-600 dark:text-gray-300">Operaator:</span>
+                    <span>${order.machine_operator}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="font-semibold text-gray-600 dark:text-gray-300">Tüüp:</span>
+                    <span>${order.order_type === "material_order" ? "Materjalitellimus" : order.order_type === "crate_removal" ? "Kastide eemaldus" : order.order_type}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="font-semibold text-gray-600 dark:text-gray-300">Uus kast:</span>
+                    <span>${order.order_type === "crate_removal" ? (order.replacement_crate || "Puudub") : "-"}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="font-semibold text-gray-600 dark:text-gray-300">Märkused:</span>
+                    <span>${order.additional_notes || "-"}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="font-semibold text-gray-600 dark:text-gray-300">Aeg:</span>
+                    <span>${order.created_at ? new Date(order.created_at).toLocaleString('et-EE', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }) : "-"}</span>
+                </div>
             </div>
         `;
         cardsContainer.appendChild(card);

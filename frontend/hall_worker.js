@@ -41,7 +41,7 @@ function showTab(tab) {
     ];
     tabs.forEach(({ id, active }) => {
         const btn = document.getElementById(id);
-        btn.classList.toggle('bg-blue-600', active);
+        btn.classList.toggle('bg-sigma', active);
         btn.classList.toggle('text-white', active);
         btn.classList.toggle('shadow', active);
         btn.classList.toggle('bg-gray-200', !active);
@@ -78,22 +78,19 @@ async function fetchOrders() {
             const inProgressOrders = sortedOrders.filter(order => order.status === 'in_progress');
             const completedOrders = sortedOrders.filter(order => order.status === 'completed');
 
-            // MOBILE VIEW
-            const isMobile = window.innerWidth < 640;
-
             let ordersToShow = [];
             if (activeTab === 'pending') ordersToShow = pendingOrders;
             else if (activeTab === 'in-progress') ordersToShow = inProgressOrders;
             else if (activeTab === 'history') ordersToShow = completedOrders;
 
-            if (isMobile) {
-                renderOrderCards(ordersToShow);
-            } else {
-                ordersToShow.forEach((order, idx) => {
-                    const orderCard = createOrderCard(order, idx);
-                    ordersContainer.appendChild(orderCard);
-                });
-            }
+
+            ordersToShow.forEach((order, idx) => {
+                const orderRow = createOrderCard(order, idx);
+                ordersContainer.appendChild(orderRow);
+            });
+
+            renderOrderCards(ordersToShow);
+
         } else {
             showError("Tellimuste laadimine ebaõnnestus.");
         }
@@ -165,7 +162,7 @@ function createOrderCard(order, index) {
 
         const completeButton = document.createElement("button");
         completeButton.textContent = "Täidetud";
-        completeButton.className = "inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white font-medium rounded-full shadow hover:bg-blue-700 transition duration-200";
+        completeButton.className = "inline-flex items-center gap-2 px-4 py-2 bg-sigma text-white font-medium rounded-full shadow hover:bg-blue-700 transition duration-200";
         completeButton.onclick = () => markOrderCompleted(order.id);
 
         actionCell.appendChild(cancelButton);
@@ -180,34 +177,64 @@ function renderOrderCards(orders) {
     const cardsContainer = document.getElementById("orders-cards");
     cardsContainer.innerHTML = "";
     orders.forEach(order => {
+        const statusMap = {
+            pending: { text: "Ootel", color: "bg-yellow-100 text-yellow-800" },
+            in_progress: { text: "Töös", color: "bg-blue-100 text-blue-800" },
+            completed: { text: "Täidetud", color: "bg-green-100 text-green-800" }
+        };
+        const status = statusMap[order.status] || { text: order.status, color: "bg-gray-200 text-gray-800" };
+
         const card = document.createElement("div");
-        card.className = "mb-4 rounded-xl shadow bg-gray-100 dark:bg-gray-700 p-4";
+        card.className = "mb-6 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-lg bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-800 dark:via-gray-900 dark:to-gray-800 p-5";
         card.innerHTML = `
-            <div class="flex justify-between mb-2">
-                <span class="font-semibold">Operaator:</span>
-                <span>${order.machine_operator}</span>
+            <div class="flex justify-between items-center mb-3">
+                <span class="text-lg font-bold text-gray-700 dark:text-gray-100">Tellimus #${order.id || ""}</span>
+                <span class="px-3 py-1 rounded-full text-xs font-semibold ${status.color}">${status.text}</span>
             </div>
-            <div class="flex justify-between mb-2">
-                <span class="font-semibold">Tüüp:</span>
-                <span>${order.order_type === "material_order" ? "Materjalitellimus" : order.order_type === "crate_removal" ? "Kastide eemaldus" : order.order_type}</span>
-            </div>
-            <div class="flex justify-between mb-2">
-                <span class="font-semibold">Uus kast:</span>
-                <span>${order.order_type === "crate_removal" ? (order.replacement_crate || "Puudub") : "-"}</span>
-            </div>
-            <div class="flex justify-between mb-2">
-                <span class="font-semibold">Märkused:</span>
-                <span>${order.additional_notes || "-"}</span>
-            </div>
-            <div class="flex justify-between mb-2">
-                <span class="font-semibold">Aeg:</span>
-                <span>${order.created_at ? new Date(order.created_at).toLocaleString('et-EE', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }) : "-"}</span>
+            <div class="space-y-2 mb-4">
+                <div class="flex justify-between">
+                    <span class="font-semibold text-gray-600 dark:text-gray-300">Operaator:</span>
+                    <span>${order.machine_operator}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="font-semibold text-gray-600 dark:text-gray-300">Tüüp:</span>
+                    <span>${order.order_type === "material_order" ? "Materjalitellimus" : order.order_type === "crate_removal" ? "Kastide eemaldus" : order.order_type}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="font-semibold text-gray-600 dark:text-gray-300">Uus kast:</span>
+                    <span>${order.order_type === "crate_removal" ? (order.replacement_crate || "Puudub") : "-"}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="font-semibold text-gray-600 dark:text-gray-300">Märkused:</span>
+                    <span>${order.additional_notes || "-"}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="font-semibold text-gray-600 dark:text-gray-300">Aeg:</span>
+                    <span>${order.created_at ? new Date(order.created_at).toLocaleString('et-EE', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }) : "-"}</span>
+                </div>
             </div>
             <div class="flex gap-2 mt-2">
-                ${activeTab === 'pending' ? `<button class="flex-1 px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700 transition" onclick="markOrderInProgress('${order.id}')">Võta vastu</button>` : ""}
+                ${activeTab === 'pending' ? `
+                    <button
+                        class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full font-semibold bg-green-600 text-white shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400 transition"
+                        onclick="markOrderInProgress('${order.id}')">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                        Nõustu
+                    </button>
+                ` : ""}
                 ${activeTab === 'in-progress' ? `
-                    <button class="flex-1 px-2 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition" onclick="markOrderPending('${order.id}')">Loobu</button>
-                    <button class="flex-1 px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition" onclick="markOrderCompleted('${order.id}')">Täidetud</button>
+                    <button
+                        class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full font-semibold bg-red-600 text-white shadow-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-400 transition"
+                        onclick="markOrderPending('${order.id}')">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                        Loobu
+                    </button>
+                    <button
+                        class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full font-semibold bg-sigma text-white shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+                        onclick="markOrderCompleted('${order.id}')">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                        Täidetud
+                    </button>
                 ` : ""}
             </div>
         `;
@@ -264,3 +291,7 @@ function showError(message) {
     `;
 }
 
+// Make status update functions available globally for inline onclick
+window.markOrderInProgress = markOrderInProgress;
+window.markOrderPending = markOrderPending;
+window.markOrderCompleted = markOrderCompleted;
