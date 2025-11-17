@@ -126,6 +126,7 @@ function createOrderRow(order, index) {
 
     const cells = [
         order.machine_operator,
+        order.press_number || "-",
         orderType,
         order.order_type === "crate_removal" ? (order.replacement_crate || "Puudub") : "-",
         order.additional_notes || "-",
@@ -228,6 +229,10 @@ function renderOrderCards(orders) {
                 <div class="flex justify-between">
                     <span class="font-semibold text-gray-600 dark:text-gray-300">Operaator:</span>
                     <span>${order.machine_operator}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="font-semibold text-gray-600 dark:text-gray-300">Pressi nr:</span>
+                    <span>${order.press_number || "-"}</span>
                 </div>
                 <div class="flex justify-between">
                     <span class="font-semibold text-gray-600 dark:text-gray-300">Tüüp:</span>

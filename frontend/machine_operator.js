@@ -116,6 +116,7 @@ function renderOrders() {
         <thead>
             <tr class="bg-gray-300 dark:bg-gray-600">
                 <th class="p-2 sm:p-4 font-semibold">Operaator</th>
+                <th class="p-2 sm:p-4 font-semibold">Pressi nr</th>
                 <th class="p-2 sm:p-4 font-semibold">Tellimuse tüüp</th>
                 <th class="p-2 sm:p-4 font-semibold">Uus kast</th>
                 <th class="p-2 sm:p-4 font-semibold">Märkused</th>
@@ -146,18 +147,16 @@ function renderOrders() {
             timeZone: 'Europe/Tallinn'
         });
 
-
-
         // Cells
         tr.innerHTML = `
             <td class="p-4">${order.machine_operator}</td>
+            <td class="p-4">${order.press_number || "-"}</td>
             <td class="p-4">${orderType}</td>
             <td class="p-4">${order.order_type === "crate_removal" ? (order.replacement_crate || "Puudub") : '-'}</td>
             <td class="p-4">${order.additional_notes ? order.additional_notes : '-'}</td>
             <td class="p-4">${createdAt}</td>
             <td class="p-4"><div class="flex flex-col sm:flex-row gap-2"></div></td>
         `;
-
         const buttonContainer = tr.querySelector('td:last-child > .flex');
         if (activeTab === 'pending') {
             const cancelButton = document.createElement("button");
@@ -299,6 +298,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const replacementCrateSection = document.getElementById("replacement-crate-section");
   const replacementCrateCheckbox = document.getElementById("replacement-crate");
   const additionalNotes = document.getElementById("additional-notes");
+  const pressNumberInput = document.getElementById("press-number");
 
   let selectedOrderType = "";
 
@@ -335,13 +335,25 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
     }
 
-    const sendReplacementCrate = replacementCrateCheckbox.checked ? "yes" : "no";
-    const notes = additionalNotes.value.trim();
-    const token = localStorage.getItem("token");
-    const orderData = {
-        order_type: selectedOrderType,
-        additional_notes: notes,
-    };
+const pressNumberValueRaw = pressNumberInput ? pressNumberInput.value.trim() : "";
+if (!pressNumberValueRaw) {
+    showError("Palun sisesta pressi number.");
+    return;
+}
+const pressNumberValue = parseInt(pressNumberValueRaw, 10);
+if (!Number.isInteger(pressNumberValue) || pressNumberValue <= 0) {
+    showError("Palun sisesta kehtiv pressi number.");
+    return;
+}
+
+const sendReplacementCrate = replacementCrateCheckbox.checked ? "yes" : "no";
+const notes = additionalNotes.value.trim();
+const token = localStorage.getItem("token");
+const orderData = {
+    order_type: selectedOrderType,
+    additional_notes: notes,
+    press_number: pressNumberValue
+};
 
     if (selectedOrderType === "crate_removal") {
         orderData.replacement_crate = sendReplacementCrate;
@@ -359,16 +371,17 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         const result = await response.json();
-        if (response.ok && result.success) {
-        showSuccess("Tellimus saadetud!");
-        orderForm.reset();
-        orderTypeInput.value = "";
-        selectedOrderType = "";
-        replacementCrateCheckbox.checked = false;
-        replacementCrateSection.classList.add("hidden");
+if (response.ok && result.success) {
+showSuccess("Tellimus saadetud!");
+orderForm.reset();
+if (pressNumberInput) pressNumberInput.value = "";
+orderTypeInput.value = "";
+selectedOrderType = "";
+replacementCrateCheckbox.checked = false;
+replacementCrateSection.classList.add("hidden");
 
-        orderTypeButtons.forEach(btn => btn.classList.remove("bg-blue-700", "text-white"));
-        } else {
+orderTypeButtons.forEach(btn => btn.classList.remove("bg-blue-700", "text-white"));
+} else {
             showError("Tellimuse saatmine ebaõnnestus: " + (result.message || "Viga serveris"));
         }
 
@@ -415,6 +428,10 @@ function renderOrderCards(orders) {
                 <div class="flex justify-between">
                     <span class="font-semibold text-gray-600 dark:text-gray-300">Operaator:</span>
                     <span>${order.machine_operator}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="font-semibold text-gray-600 dark:text-gray-300">Pressi nr:</span>
+                    <span>${order.press_number || "-"}</span>
                 </div>
                 <div class="flex justify-between">
                     <span class="font-semibold text-gray-600 dark:text-gray-300">Tüüp:</span>

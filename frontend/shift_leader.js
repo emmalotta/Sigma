@@ -142,6 +142,7 @@ function createOrderRow(order, index) {
 
     row.innerHTML = `
         <td class="p-2 sm:p-4">${order.machine_operator}</td>
+        <td class="p-2 sm:p-4">${order.press_number || "-"}</td> <!-- New Column -->
         <td class="p-2 sm:p-4">${orderType}</td>
         ${order.order_type === "crate_removal" ? `<td class="p-2 sm:p-4">${order.replacement_crate || "Puudub"}</td>` : `<td class="p-2 sm:p-4">-</td>`}
         <td class="p-2 sm:p-4">${order.additional_notes || "-"}</td>
@@ -149,7 +150,7 @@ function createOrderRow(order, index) {
         <td class="p-2 sm:p-4"><div class="flex flex-col sm:flex-row gap-2"></div></td>
     `;
 
-    // Add "Tühista" button for pending orders
+    
     if (order.status === "pending") {
         const buttonContainer = row.querySelector('td:last-child > .flex');
         const cancelButton = document.createElement("button");

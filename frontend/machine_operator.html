@@ -62,7 +62,11 @@
           <form id="order-form" class="space-y-6 bg-white dark:bg-gray-900 p-4 rounded-xl shadow-md border border-gray-200 dark:border-none">
               <!-- Order form title -->
               <h2 class="text-lg font-bold text-gray-800 dark:text-gray-100 mb-2 text-center p-8">Uus tellimus:</h2>
-              <h2 class="text-lg font-bold text-gray-800 dark:text-gray-100 mb-2 p-12">Pressi nr:</h2>
+              <div class="mb-4">
+                  <label for="press-number" class="block mb-1 font-semibold text-gray-700 dark:text-gray-200">Pressi nr</label>
+                  <input id="press-number" name="press-number" type="number" min="1" placeholder="Sisesta pressi number" required
+                         class="block w-full rounded-lg border border-gray-300 dark:bg-gray-700 dark:text-gray-100 p-2 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition" />
+              </div>
               <!-- Order type buttons -->
               <div class="flex flex-wrap gap-3 justify-center">
                   <button type="button" class="order-btn bg-sigma text-white border-2 border-solid border-transparent px-4 py-2 rounded-lg font-semibold shadow-sm hover:bg-blue-600 dark:hover:bg-blue-700 transition w-full sm:w-auto" data-type="rubber">

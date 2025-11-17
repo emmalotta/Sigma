@@ -31,7 +31,7 @@ const db = mysql.createPool({
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
-    timezone: '+03:00', 
+    timezone: '+02:00', 
 });
 
 db.query("SET time_zone = '+03:00'", (err) => {
@@ -177,18 +177,20 @@ app.post("/api/orders", verifyToken, (req, res) => {
         return res.status(403).json({ success: false, message: "Unauthorized. Only machine operators can create orders." });
     }
 
-    const { order_type, replacement_crate, additional_notes } = req.body;
+    const { order_type, replacement_crate, additional_notes, press_number } = req.body;
     const machineOperator = req.user.username;
 
-
-
-    console.log("Parsed Data - order_type:", order_type, "replacement_crate:", replacement_crate, "additional_notes:", additional_notes);
-
+    console.log("Parsed Data - order_type:", order_type, "replacement_crate:", replacement_crate, "additional_notes:", additional_notes, "press_number:", press_number);
 
     const validOrderTypes = ['crate_removal', 'rubber', 'packaging', 'component'];
     if (!order_type || !validOrderTypes.includes(order_type)) {
         console.log("Invalid order type:", order_type);  // Debugging log
         return res.status(400).json({ success: false, message: "Invalid order type." });
+    }
+
+    // Validate press_number
+    if (!press_number || isNaN(press_number) || press_number <= 0) {
+        return res.status(400).json({ success: false, message: "Invalid press number." });
     }
 
     // REPLACEMENT CRATE
@@ -201,14 +203,15 @@ app.post("/api/orders", verifyToken, (req, res) => {
         replacementCrateValue = replacement_crate;
     }
 
-const orderData = {
-    order_type,
-    replacement_crate: replacementCrateValue,
-    additional_notes: additional_notes || null,
-    machine_operator: machineOperator,
-    status: 'pending',  // New orders are always pending
-    created_at: new Date().toLocaleString("sv-SE", { timeZone: "Europe/Tallinn" }) // YYYY-MM-DD HH:mm:ss
-};
+    const orderData = {
+        order_type,
+        replacement_crate: replacementCrateValue,
+        additional_notes: additional_notes || null,
+        press_number: parseInt(press_number, 10),
+        machine_operator: machineOperator,
+        status: 'pending',  // New orders are always pending
+        created_at: new Date().toLocaleString("sv-SE", { timeZone: "Europe/Tallinn" }) // YYYY-MM-DD HH:mm:ss
+    };
 
     db.query("INSERT INTO orders SET ?", orderData, (err, result) => {
         if (err) {
