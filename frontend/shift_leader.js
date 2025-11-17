@@ -71,6 +71,9 @@ async function fetchOrders() {
         const data = await response.json();
 
         if (data.success) {
+            // Sort orders by created_at descending (newest first)
+            data.orders.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
             const ordersContainer = document.getElementById("orders-container");
             const cardsContainer = document.getElementById("orders-cards");
             ordersContainer.innerHTML = '';
@@ -131,25 +134,34 @@ function createOrderRow(order, index) {
 
     let statusLabel = "";
     switch (order.status) {
-        case "pending":
-            statusLabel = "Ootel"; break;
-        case "in_progress":
-            statusLabel = "Töös"; break;
-        case "completed":
-            statusLabel = "Täidetud"; break;
-        default:
-            statusLabel = order.status;
+        case "pending": statusLabel = "Ootel"; break;
+        case "in_progress": statusLabel = "Töös"; break;
+        case "completed": statusLabel = "Täidetud"; break;
+        default: statusLabel = order.status;
     }
 
     row.innerHTML = `
         <td class="p-2 sm:p-4">${order.machine_operator}</td>
         <td class="p-2 sm:p-4">${orderType}</td>
-        ${order.order_type === "crate_removal" ? `
-            <td class="p-2 sm:p-4">${order.replacement_crate || "Puudub"}</td>` : `
-            <td class="p-2 sm:p-4">-</td>`}
+        ${order.order_type === "crate_removal" ? `<td class="p-2 sm:p-4">${order.replacement_crate || "Puudub"}</td>` : `<td class="p-2 sm:p-4">-</td>`}
         <td class="p-2 sm:p-4">${order.additional_notes || "-"}</td>
         <td class="p-2 sm:p-4 font-semibold">${statusLabel}</td>
+        <td class="p-2 sm:p-4"><div class="flex flex-col sm:flex-row gap-2"></div></td>
     `;
+
+    // Add "Tühista" button for pending orders
+    if (order.status === "pending") {
+        const buttonContainer = row.querySelector('td:last-child > .flex');
+        const cancelButton = document.createElement("button");
+        cancelButton.textContent = "Tühista";
+        cancelButton.className = "inline-flex items-center justify-center gap-2 px-4 py-2 bg-red-600 text-white font-medium rounded-full shadow hover:bg-red-700 transition duration-200";
+        cancelButton.addEventListener("click", async () => {
+            if (confirm("Kas oled kindel, et soovid tellimuse tühistada?")) {
+                await cancelOrder(order.id);
+            }
+        });
+        buttonContainer.appendChild(cancelButton);
+    }
 
     return row;
 }
@@ -200,17 +212,75 @@ function renderOrderCards(orders) {
                 </div>
                 <div class="flex justify-between">
                     <span class="font-semibold text-gray-600 dark:text-gray-300">Aeg:</span>
-                    <span>${order.created_at ? new Date(order.created_at).toLocaleString('et-EE', {
-                    year: 'numeric',
-                    month: '2-digit',
-                    day: '2-digit',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    timeZone: 'Europe/Tallinn'
-                    }) : "-"}</span>
+                    <span>${order.created_at ? new Date(order.created_at).toLocaleString('et-EE', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }) : "-"}</span>
                 </div>
             </div>
         `;
+        let buttonsHtml = '';
+        if (order.status === 'pending') {
+            buttonsHtml = `
+                <button
+                    class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full font-semibold bg-red-600 text-white shadow-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-400 transition"
+                    data-id="${order.id}">
+                    Tühista
+                </button>
+            `;
+        }
+        card.innerHTML += `
+            <div class="flex gap-2 mt-2">
+                ${buttonsHtml}
+            </div>
+        `;
         cardsContainer.appendChild(card);
+
+        // Attach event listener for cancel button
+        if (order.status === 'pending') {
+            const cancelBtn = card.querySelector('button[data-id]');
+            if (cancelBtn) {
+                cancelBtn.addEventListener("click", async () => {
+                    if (confirm("Kas oled kindel, et soovid tellimuse tühistada?")) {
+                        await cancelOrder(order.id);
+                    }
+                });
+            }
+        }
     });
+}
+
+async function cancelOrder(orderId) {
+    try {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/orders/${orderId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        const data = await response.json();
+        if (data.success) {
+            showSuccess("Tellimus tühistatud!");
+            await fetchOrders();
+        } else {
+            showError(data.message || "Tellimuse tühistamine ebaõnnestus.");
+        }
+    } catch (error) {
+        console.error("Viga tellimuse tühistamisel:", error);
+        showError("Tellimuse tühistamisel tekkis viga.");
+    }
+}
+
+function showSuccess(message) {
+    let msg = document.getElementById("success-message");
+    if (!msg) {
+        // If not present, create it above the table/cards
+        msg = document.createElement("div");
+        msg.id = "success-message";
+        msg.className = "mb-4 text-green-700 bg-green-100 border border-green-300 rounded px-4 py-2 text-center";
+        const container = document.querySelector(".w-full.max-w-4xl");
+        if (container) container.insertBefore(msg, container.firstChild);
+    }
+    msg.textContent = message;
+    msg.style.display = "block";
+    setTimeout(() => {
+        msg.style.display = "none";
+    }, 2500);
 }

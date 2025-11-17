@@ -31,7 +31,11 @@ const db = mysql.createPool({
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
-    timezone: 'Z',
+    timezone: '+03:00', 
+});
+
+db.query("SET time_zone = '+03:00'", (err) => {
+    if (err) console.error("Failed to set MySQL time zone:", err);
 });
 
 const PORT = process.env.PORT || 8080;
@@ -197,13 +201,14 @@ app.post("/api/orders", verifyToken, (req, res) => {
         replacementCrateValue = replacement_crate;
     }
 
-    const orderData = {
-        order_type,
-        replacement_crate: replacementCrateValue,
-        additional_notes: additional_notes || null,
-        machine_operator: machineOperator,
-        status: 'pending',  // New orders are always pending
-    };
+const orderData = {
+    order_type,
+    replacement_crate: replacementCrateValue,
+    additional_notes: additional_notes || null,
+    machine_operator: machineOperator,
+    status: 'pending',  // New orders are always pending
+    created_at: new Date().toLocaleString("sv-SE", { timeZone: "Europe/Tallinn" }) // YYYY-MM-DD HH:mm:ss
+};
 
     db.query("INSERT INTO orders SET ?", orderData, (err, result) => {
         if (err) {
@@ -305,6 +310,36 @@ app.put("/api/orders/:id", verifyToken, (req, res) => {
     );
 });
 
+
+// DELETE ORDER (Machine Operators)
+app.delete("/api/orders/:id", verifyToken, (req, res) => {
+    const orderId = req.params.id;
+    const username = req.user.username;
+    const role = req.user.role;
+
+    let query, params;
+    if (role === "machine_operator") {
+        query = "DELETE FROM orders WHERE id = ? AND machine_operator = ? AND status = 'pending'";
+        params = [orderId, username];
+    } else if (role === "shift_leader") {
+        query = "DELETE FROM orders WHERE id = ? AND status = 'pending'";
+        params = [orderId];
+    } else {
+        return res.status(403).json({ success: false, message: "Unauthorized. Only machine operators and shift leaders can delete orders." });
+    }
+
+    db.query(query, params, (err, result) => {
+        if (err) {
+            console.error("Database Error:", err);
+            return res.status(500).json({ success: false, message: "Database error" });
+        }
+        if (result.affectedRows > 0) {
+            res.json({ success: true, message: "Order cancelled!" });
+        } else {
+            res.status(400).json({ success: false, message: "Order not found or cannot be cancelled." });
+        }
+    });
+});
 
 //app.use(express.static(path.join(__dirname, '../frontend/dist')));
 

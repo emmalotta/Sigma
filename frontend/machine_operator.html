@@ -10,7 +10,7 @@
 
 <body class="hidden bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen">
   <main class="flex justify-center items-center min-h-screen p-4">
-    <div class="w-full max-w-2xl bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md">
+    <div class="w-full max-w-4xl mx-auto bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md">
       <div class="flex justify-start mb-2">
         <button id="logout-btn" class="p-2 bg-red-600 text-white rounded hover:bg-red-700 shadow" title="Logi välja" aria-label="Logi välja">
           <svg width="24" height="24" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24">
@@ -24,7 +24,7 @@
         </div>
       </div>
 
-      <!-- Main content centered -->
+      <!-- TAB NAVIGATION -->
       <div class="flex justify-center mb-8">
         <div class="inline-flex rounded-full bg-gray-200 dark:bg-gray-700 shadow p-1">
           <button id="order-tab"
@@ -62,6 +62,7 @@
           <form id="order-form" class="space-y-6 bg-white dark:bg-gray-900 p-4 rounded-xl shadow-md border border-gray-200 dark:border-none">
               <!-- Order form title -->
               <h2 class="text-lg font-bold text-gray-800 dark:text-gray-100 mb-2 text-center p-8">Uus tellimus:</h2>
+              <h2 class="text-lg font-bold text-gray-800 dark:text-gray-100 mb-2 p-12">Pressi nr:</h2>
               <!-- Order type buttons -->
               <div class="flex flex-wrap gap-3 justify-center">
                   <button type="button" class="order-btn bg-sigma text-white border-2 border-solid border-transparent px-4 py-2 rounded-lg font-semibold shadow-sm hover:bg-blue-600 dark:hover:bg-blue-700 transition w-full sm:w-auto" data-type="rubber">
@@ -75,6 +76,9 @@
                   </button>
                   <button type="button" class="order-btn bg-sigma text-white border-2 border-solid border-transparent px-4 py-2 rounded-lg font-semibold shadow-sm hover:bg-blue-600 dark:hover:bg-blue-700 transition w-full sm:w-auto" data-type="crate_removal">
                       Toodangu äraviimine
+                  </button>
+                  <button type="button" class="order-btn bg-sigma text-white border-2 border-solid border-transparent px-4 py-2 rounded-lg font-semibold shadow-sm hover:bg-blue-600 dark:hover:bg-blue-700 transition w-full sm:w-auto" data-type="packaging">
+                      Toorikud
                   </button>
               </div>
               <input type="hidden" id="order-type" name="order-type" />
@@ -99,13 +103,11 @@
           </form>
       </div>
 
-      <!-- ORDERS CONTAINER -->
+      <!-- ORDERS CONTAINER (DESKTOP) -->
       <div id="orders-container" class="mt-4"></div>
 
-      <!-- MOBILE -->
+      <!-- MOBILE CARDS -->
       <div class="block sm:hidden" id="orders-cards"></div>
-
-
     </div>
   </main>
 
